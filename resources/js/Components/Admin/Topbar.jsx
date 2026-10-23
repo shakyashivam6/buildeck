@@ -1,4 +1,3 @@
-import { Form } from "@inertiajs/react";
 
 export default function Topbar() {
     return (
@@ -119,7 +118,7 @@ export default function Topbar() {
                                     <span className="noti-icon-badge" ></span>
                                 </button>
 
-                                <div className="dropdown-menu p-0 dropdown-menu-end dropdown-menu-lg" style="min-height: 300px;">
+                                <div className="dropdown-menu p-0 dropdown-menu-end dropdown-menu-lg" style={{ minHeight: '300px' }}>
                                     <div className="p-2 border-bottom position-relative border-dashed">
                                         <div className="row align-items-center">
                                             <div className="col">
@@ -146,7 +145,7 @@ export default function Topbar() {
                                         </div>
                                     </div>
 
-                                    <div className="position-relative rounded-0" style="max-height: 300px;" data-simplebar>
+                                    <div className="position-relative rounded-0" style={{ maxHeight: '300px' }} data-simplebar>
                                         {/* item*/}
                                         <div className="dropdown-item notification-item py-2 text-wrap active" id="notification-1">
                                             <span className="d-flex align-items-center">
@@ -428,19 +427,19 @@ export default function Topbar() {
                 {/* Topbar End */}
 
                 {/* Search Modal  */}
-                <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content bg-transparent">
-                            <Form>
-                                <div class="card mb-1">
-                                    <div class="px-3 py-2 d-flex flex-row align-items-center" id="top-search">
-                                        <i class="ri-search-line fs-22"></i>
-                                        <input type="search" class="form-control border-0" id="search-modal-input"
+                <div className="modal fade" id="searchModal" tabIndex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content bg-transparent">
+                            <form>
+                                <div className="card mb-1">
+                                    <div className="px-3 py-2 d-flex flex-row align-items-center" id="top-search">
+                                        <i className="ri-search-line fs-22"></i>
+                                        <input type="search" className="form-control border-0" id="search-modal-input"
                                             placeholder="Search for actions, people," />
-                                        <button type="submit" class="btn p-0" data-bs-dismiss="modal" aria-label="Close">[esc]</button>
+                                        <button type="submit" className="btn p-0" data-bs-dismiss="modal" aria-label="Close">[esc]</button>
                                     </div>
                                 </div>
-                            </Form>
+                            </form>
                         </div>
                     </div>
                 </div>

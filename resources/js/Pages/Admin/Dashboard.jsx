@@ -286,7 +286,7 @@ export default function Dashboard() {
                                                             className="ri-circle-fill fs-12 text-success"></i> Completed
                                                         </h5>
                                                     </td>
-                                                    <td style="width: 30px;">
+                                                    <td style={{ width: '30px' }}>
                                                         <div className="dropdown">
                                                             <a href="#"
                                                                 className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
@@ -321,7 +321,7 @@ export default function Dashboard() {
                                                         <h5 className="fs-14 mt-1 fw-normal"><i
                                                             className="ri-circle-fill fs-12 text-danger"></i> Failed</h5>
                                                     </td>
-                                                    <td style="width: 30px;">
+                                                    <td style={{ width: '30px' }}>
                                                         <div className="dropdown">
                                                             <a href="#"
                                                                 className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
@@ -356,7 +356,7 @@ export default function Dashboard() {
                                                         <h5 className="fs-14 mt-1 fw-normal"><i
                                                             className="ri-circle-fill fs-12 text-warning"></i> Pending</h5>
                                                     </td>
-                                                    <td style="width: 30px;">
+                                                    <td style={{ width: '30px' }}>
                                                         <div className="dropdown">
                                                             <a href="#"
                                                                 className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
@@ -392,7 +392,7 @@ export default function Dashboard() {
                                                             className="ri-circle-fill fs-12 text-success"></i> Completed
                                                         </h5>
                                                     </td>
-                                                    <td style="width: 30px;">
+                                                    <td style={{ width: '30px' }}>
                                                         <div className="dropdown">
                                                             <a href="#"
                                                                 className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
@@ -427,7 +427,7 @@ export default function Dashboard() {
                                                         <h5 className="fs-14 mt-1 fw-normal"><i
                                                             className="ri-circle-fill fs-12 text-warning"></i> Pending</h5>
                                                     </td>
-                                                    <td style="width: 30px;">
+                                                    <td style={{ width: '30px' }}>
                                                         <div className="dropdown">
                                                             <a href="#"
                                                                 className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
@@ -531,7 +531,7 @@ export default function Dashboard() {
                                                             className="ri-circle-fill fs-12 text-success"></i> Active
                                                         </h5>
                                                     </td>
-                                                    <td style="width: 30px;">
+                                                    <td style={{ width: '30px' }}>
                                                         <div className="dropdown">
                                                             <a href="#"
                                                                 className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
@@ -573,7 +573,7 @@ export default function Dashboard() {
                                                             className="ri-circle-fill fs-12 text-warning"></i> Pending
                                                         </h5>
                                                     </td>
-                                                    <td style="width: 30px;">
+                                                    <td style={{ width: '30px' }}>
                                                         <div className="dropdown">
                                                             <a href="#"
                                                                 className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
@@ -616,7 +616,7 @@ export default function Dashboard() {
                                                             className="ri-circle-fill fs-12 text-danger"></i> Inactive
                                                         </h5>
                                                     </td>
-                                                    <td style="width: 30px;">
+                                                    <td style={{ width: '30px' }}>
                                                         <div className="dropdown">
                                                             <a href="#"
                                                                 className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
@@ -658,7 +658,7 @@ export default function Dashboard() {
                                                             className="ri-circle-fill fs-12 text-success"></i> Active
                                                         </h5>
                                                     </td>
-                                                    <td style="width: 30px;">
+                                                    <td style={{ width: '30px' }}>
                                                         <div className="dropdown">
                                                             <a href="#"
                                                                 className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
@@ -700,7 +700,7 @@ export default function Dashboard() {
                                                             className="ri-circle-fill fs-12 text-warning"></i> Pending
                                                         </h5>
                                                     </td>
-                                                    <td style="width: 30px;">
+                                                    <td style={{ width: '30px' }}>
                                                         <div className="dropdown">
                                                             <a href="#"
                                                                 className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"

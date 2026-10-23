@@ -869,7 +869,7 @@ export default function Sidebar() {
             {/* Sidenav Menu End */}
 
             {/* Color Top line */}
-            <div class="color-line"></div>
+            <div className="color-line"></div>
         </>
     );
 }
