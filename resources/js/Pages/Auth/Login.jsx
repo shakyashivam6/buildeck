@@ -1,9 +1,3 @@
-import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
 import AbhiLayout from '@/Layouts/AbhiLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
@@ -23,79 +17,106 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <GuestLayout>
-            <Head title="Log in" />
+        <AbhiLayout>
+            <Head title="Log In" />
+
+            <h4 className="fw-semibold mb-2 fs-18">Log in to your account</h4>
+            <p className="text-muted mb-4">
+                Enter your email address and password to access admin panel.
+            </p>
 
             {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
+                <div className="alert alert-success mb-3" role="alert">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
+            <form onSubmit={submit} className="text-start mb-3">
+                <div className="mb-3">
+                    <label className="form-label" htmlFor="email">
+                        Email
+                    </label>
+                    <input
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
+                        className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                        placeholder="Enter your email"
                         autoComplete="username"
-                        isFocused={true}
+                        autoFocus
                         onChange={(e) => setData('email', e.target.value)}
                     />
-
-                    <InputError message={errors.email} className="mt-2" />
+                    {errors.email && (
+                        <div className="invalid-feedback d-block mt-1">
+                            {errors.email}
+                        </div>
+                    )}
                 </div>
 
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
+                <div className="mb-3">
+                    <label className="form-label" htmlFor="password">
+                        Password
+                    </label>
+                    <input
                         id="password"
                         type="password"
                         name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
+                        className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                        placeholder="Enter your password"
                         autoComplete="current-password"
                         onChange={(e) => setData('password', e.target.value)}
                     />
-
-                    <InputError message={errors.password} className="mt-2" />
+                    {errors.password && (
+                        <div className="invalid-feedback d-block mt-1">
+                            {errors.password}
+                        </div>
+                    )}
                 </div>
 
-                <div className="mt-4 block">
-                    <label className="flex items-center">
-                        <Checkbox
+                <div className="d-flex justify-content-between mb-3">
+                    <div className="form-check">
+                        <input
+                            type="checkbox"
                             name="remember"
+                            id="checkbox-signin"
+                            className="form-check-input"
                             checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
+                            onChange={(e) => setData('remember', e.target.checked)}
                         />
-                        <span className="ms-2 text-sm text-gray-600">
+                        <label className="form-check-label" htmlFor="checkbox-signin">
                             Remember me
-                        </span>
-                    </label>
-                </div>
+                        </label>
+                    </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
+                    {/* {canResetPassword && (
                         <Link
                             href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="text-muted border-bottom border-dashed"
                         >
-                            Forgot your password?
+                            Forget Password
                         </Link>
-                    )}
+                    )} */}
+                </div>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
+                <div className="d-grid">
+                    <button
+                        className="btn btn-primary fw-semibold"
+                        type="submit"
+                        disabled={processing}
+                    >
+                        {processing ? 'Logging in...' : 'Login'}
+                    </button>
                 </div>
             </form>
-        </GuestLayout>
+
+            {/* <p className="text-muted fs-14 mb-4">
+                Don't have an account?{' '}
+                <Link href="#" className="fw-semibold text-danger ms-1">
+                    Sign Up !
+                </Link>
+            </p> */}
+        </AbhiLayout>
     );
 }
