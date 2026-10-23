@@ -7,8 +7,6 @@ export default function Dashboard() {
             {/* Start Page Content here */}
             {/* ============================================================== */}
 
-            <div className="page-content">
-                <div className="page-container">
 
                     <div className="alert alert-info d-flex align-items-center d-none d-md-flex" role="alert">
                         <iconify-icon icon="solar:help-bold-duotone" className="fs-24 me-1"></iconify-icon>
@@ -234,11 +232,11 @@ export default function Dashboard() {
                                                 </h4>
                                             </div>
                                             <div className="col-md-3 col-6">
-                                                <img src="assets/images/cards/american-express.svg" alt="user-card"
+                                                <img src="/assets/images/cards/american-express.svg" alt="user-card"
                                                     height="36" />
-                                                <img src="assets/images/cards/discover-card.svg" alt="user-card"
+                                                <img src="/assets/images/cards/discover-card.svg" alt="user-card"
                                                     height="36" />
-                                                <img src="assets/images/cards/mastercard.svg" alt="user-card" height="36" />
+                                                <img src="/assets/images/cards/mastercard.svg" alt="user-card" height="36" />
                                             </div>
                                         </div>
                                     </div>
@@ -513,7 +511,7 @@ export default function Dashboard() {
                                                         <div className="d-flex align-items-center">
                                                             <div className="avatar-md flex-shrink-0 me-2">
                                                                 <span className="avatar-title bg-primary-subtle rounded-circle">
-                                                                    <img src="assets/images/users/avatar-1.jpg" alt=""
+                                                                    <img src="/assets/images/users/avatar-1.jpg" alt=""
                                                                         height="26" className="rounded-circle" />
                                                                 </span>
                                                             </div>
@@ -555,7 +553,7 @@ export default function Dashboard() {
                                                         <div className="d-flex align-items-center">
                                                             <div className="avatar-md flex-shrink-0 me-2">
                                                                 <span className="avatar-title bg-info-subtle rounded-circle">
-                                                                    <img src="assets/images/users/avatar-2.jpg" alt=""
+                                                                    <img src="/assets/images/users/avatar-2.jpg" alt=""
                                                                         height="26" className="rounded-circle" />
                                                                 </span>
                                                             </div>
@@ -598,7 +596,7 @@ export default function Dashboard() {
                                                             <div className="avatar-md flex-shrink-0 me-2">
                                                                 <span
                                                                     className="avatar-title bg-secondary-subtle rounded-circle">
-                                                                    <img src="assets/images/users/avatar-3.jpg" alt=""
+                                                                    <img src="/assets/images/users/avatar-3.jpg" alt=""
                                                                         height="26" className="rounded-circle" />
                                                                 </span>
                                                             </div>
@@ -640,7 +638,7 @@ export default function Dashboard() {
                                                         <div className="d-flex align-items-center">
                                                             <div className="avatar-md flex-shrink-0 me-2">
                                                                 <span className="avatar-title bg-warning-subtle rounded-circle">
-                                                                    <img src="assets/images/users/avatar-4.jpg" alt=""
+                                                                    <img src="/assets/images/users/avatar-4.jpg" alt=""
                                                                         height="26" className="rounded-circle" />
                                                                 </span>
                                                             </div>
@@ -682,7 +680,7 @@ export default function Dashboard() {
                                                         <div className="d-flex align-items-center">
                                                             <div className="avatar-md flex-shrink-0 me-2">
                                                                 <span className="avatar-title bg-danger-subtle rounded-circle">
-                                                                    <img src="assets/images/users/avatar-5.jpg" alt=""
+                                                                    <img src="/assets/images/users/avatar-5.jpg" alt=""
                                                                         height="26" className="rounded-circle" />
                                                                 </span>
                                                             </div>
@@ -816,29 +814,6 @@ export default function Dashboard() {
                             </div> {/* end card*/}
                         </div> {/* end col*/}
                     </div> {/* end row*/}
-
-                </div> {/* container */}
-
-                {/* Footer Start */}
-                <footer className="footer">
-                    <div className="page-container">
-                        <div className="row">
-                            <div className="col-md-6 text-center text-md-start">
-                                <script>document.write(new Date().getFullYear())</script> © Highdmin - By <span className="fw-bold text-decoration-underline text-uppercase text-reset fs-12">Coderthemes</span>
-                            </div>
-                            <div className="col-md-6">
-                                <div className="text-md-end footer-links d-none d-md-block">
-                                    <a href="javascript: void(0);">About</a>
-                                    <a href="javascript: void(0);">Support</a>
-                                    <a href="javascript: void(0);">Contact Us</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
-                {/* end Footer */}
-
-            </div>
 
             {/* ============================================================== */}
             {/* End Page content */}

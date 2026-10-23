@@ -9,13 +9,13 @@ export default function Sidebar() {
                 {/* Brand Logo */}
                 <a href="index.html" className="logo">
                     <span className="logo-light">
-                        <span className="logo-lg"><img src="assets/images/logo.png" alt="logo" /></span>
-                        <span className="logo-sm"><img src="assets/images/logo-sm.png" alt="small logo" /></span>
+                        <span className="logo-lg"><img src="/assets/images/logo.png" alt="logo" /></span>
+                        <span className="logo-sm"><img src="/assets/images/logo-sm.png" alt="small logo" /></span>
                     </span>
 
                     <span className="logo-dark">
-                        <span className="logo-lg"><img src="assets/images/logo-dark.png" alt="dark logo" /></span>
-                        <span className="logo-sm"><img src="assets/images/logo-sm.png" alt="small logo" /></span>
+                        <span className="logo-lg"><img src="/assets/images/logo-dark.png" alt="dark logo" /></span>
+                        <span className="logo-sm"><img src="/assets/images/logo-sm.png" alt="small logo" /></span>
                     </span>
                 </a>
 
@@ -35,7 +35,7 @@ export default function Sidebar() {
                     <div className="sidenav-user">
                         <div className="dropdown-center">
                             <a className="topbar-link dropdown-toggle text-reset drop-arrow-none px-2 d-flex align-items-center justify-content-center" data-bs-toggle="dropdown" data-bs-offset="0,19" type="button" aria-haspopup="false" aria-expanded="false">
-                                <img src="assets/images/users/avatar-1.jpg" width="42" className="rounded-circle me-2 d-flex" alt="user-image" />
+                                <img src="/assets/images/users/avatar-1.jpg" width="42" className="rounded-circle me-2 d-flex" alt="user-image" />
                                 <span className="d-flex flex-column gap-1 sidebar-user-name">
                                     <h4 className="my-0 fw-bold fs-15">Maxine Kennedy</h4>
                                     <h6 className="my-0">Admin Head</h6>

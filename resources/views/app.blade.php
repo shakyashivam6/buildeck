@@ -1,43 +1,49 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- App favicon -->
-        <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
+    <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Vendor css -->
-        <link href="{{ asset('assets/css/vendor.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
 
-        <!-- App css -->
-        <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-style" />
+    <!-- Vendor css -->
+    <link href="{{ asset('assets/css/vendor.min.css') }}" rel="stylesheet" type="text/css" />
 
-        <!-- Icons css -->
-        <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- App css -->
+    <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-style" />
 
-        <!-- Theme Config Js -->
-        <script src="{{ asset('assets/js/config.js') }}"></script>
+    <!-- Icons css -->
+    <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <!-- Theme Config Js -->
+    <script src="{{ asset('assets/js/config.js') }}"></script>
 
-        <!-- Scripts -->
-        @routes
-        @viteReactRefresh
-        @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
-        @inertiaHead
-    </head>
-    <body class="font-sans antialiased">
-        @inertia
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Vendor js -->
-        <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
+    <!-- Scripts -->
+    @routes
+    @viteReactRefresh
+    @vite(['resources/js/app.jsx', "resources/js/Pages/{$page['component']}.jsx"])
+    @inertiaHead
+</head>
 
-        <!-- App js -->
-        <script src="{{ asset('assets/js/app.js') }}"></script>
-    </body>
+<body class="font-sans antialiased">
+    @inertia
+
+    <!-- Vendor js -->
+    <script src="{{ asset('assets/js/vendor.min.js') }}"></script>
+
+    <script src="{{ asset('assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/dashboard.js') }}"></script>
+
+    <!-- App js -->
+    <script src="{{ asset('assets/js/app.js') }}"></script>
+</body>
+
 </html>

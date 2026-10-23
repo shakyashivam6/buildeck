@@ -11,13 +11,13 @@ export default function Topbar() {
                         {/* Brand Logo */}
                         <a href="index.html" className="logo">
                             <span className="logo-light">
-                                <span className="logo-lg"><img src="assets/images/logo.png" alt="logo" /></span>
-                                <span className="logo-sm"><img src="assets/images/logo-sm.png" alt="small logo" /></span>
+                                <span className="logo-lg"><img src="/assets/images/logo.png" alt="logo" /></span>
+                                <span className="logo-sm"><img src="/assets/images/logo-sm.png" alt="small logo" /></span>
                             </span>
 
                             <span className="logo-dark">
-                                <span className="logo-lg"><img src="assets/images/logo-dark.png" alt="dark logo" /></span>
-                                <span className="logo-sm"><img src="assets/images/logo-sm.png" alt="small logo" /></span>
+                                <span className="logo-lg"><img src="/assets/images/logo-dark.png" alt="dark logo" /></span>
+                                <span className="logo-sm"><img src="/assets/images/logo-sm.png" alt="small logo" /></span>
                             </span>
                         </a>
 
@@ -64,44 +64,44 @@ export default function Topbar() {
                             <div className="dropdown">
                                 <button className="topbar-link" data-bs-toggle="dropdown" data-bs-offset="0,32" type="button"
                                     aria-haspopup="false" aria-expanded="false">
-                                    <img src="assets/images/flags/us.svg" alt="user-image" className="w-100 rounded" height="18"
+                                    <img src="/assets/images/flags/us.svg" alt="user-image" className="w-100 rounded" height="18"
                                         id="selected-language-image" />
                                 </button>
 
                                 <div className="dropdown-menu dropdown-menu-end">
                                     {/* item*/}
                                     <a href="javascript:void(0);" className="dropdown-item" data-translator-lang="en">
-                                        <img src="assets/images/flags/us.svg" alt="user-image" className="me-1 rounded" height="18"
+                                        <img src="/assets/images/flags/us.svg" alt="user-image" className="me-1 rounded" height="18"
                                             data-translator-image /> <span className="align-middle">English</span>
                                     </a>
 
                                     {/* item*/}
                                     <a href="javascript:void(0);" className="dropdown-item" data-translator-lang="hi">
-                                        <img src="assets/images/flags/in.svg" alt="user-image" className="me-1 rounded" height="18"
+                                        <img src="/assets/images/flags/in.svg" alt="user-image" className="me-1 rounded" height="18"
                                             data-translator-image /> <span className="align-middle">Hindi</span>
                                     </a>
 
                                     {/* item*/}
                                     <a href="javascript:void(0);" className="dropdown-item">
-                                        <img src="assets/images/flags/de.svg" alt="user-image" className="me-1 rounded" height="18" />
+                                        <img src="/assets/images/flags/de.svg" alt="user-image" className="me-1 rounded" height="18" />
                                         <span className="align-middle">German</span>
                                     </a>
 
                                     {/* item*/}
                                     <a href="javascript:void(0);" className="dropdown-item">
-                                        <img src="assets/images/flags/it.svg" alt="user-image" className="me-1 rounded" height="18" />
+                                        <img src="/assets/images/flags/it.svg" alt="user-image" className="me-1 rounded" height="18" />
                                         <span className="align-middle" >Italian</span>
                                     </a>
 
                                     {/* item*/}
                                     <a href="javascript:void(0);" className="dropdown-item">
-                                        <img src="assets/images/flags/es.svg" alt="user-image" className="me-1 rounded" height="18" />
+                                        <img src="/assets/images/flags/es.svg" alt="user-image" className="me-1 rounded" height="18" />
                                         <span className="align-middle">Spanish</span>
                                     </a>
 
                                     {/* item*/}
                                     <a href="javascript:void(0);" className="dropdown-item">
-                                        <img src="assets/images/flags/ru.svg" alt="user-image" className="me-1 rounded" height="18" />
+                                        <img src="/assets/images/flags/ru.svg" alt="user-image" className="me-1 rounded" height="18" />
                                         <span className="align-middle">Russian</span>
                                     </a>
 
@@ -151,7 +151,7 @@ export default function Topbar() {
                                         <div className="dropdown-item notification-item py-2 text-wrap active" id="notification-1">
                                             <span className="d-flex align-items-center">
                                                 <span className="me-3 position-relative flex-shrink-0">
-                                                    <img src="assets/images/users/avatar-2.jpg" className="avatar-lg rounded-circle"
+                                                    <img src="/assets/images/users/avatar-2.jpg" className="avatar-lg rounded-circle"
                                                         alt="" />
                                                 </span>
                                                 <span className="flex-grow-1 text-muted">
@@ -174,7 +174,7 @@ export default function Topbar() {
                                         <div className="dropdown-item notification-item py-2 text-wrap" id="notification-2">
                                             <span className="d-flex align-items-center">
                                                 <span className="me-3 position-relative flex-shrink-0">
-                                                    <img src="assets/images/users/avatar-4.jpg" className="avatar-lg rounded-circle"
+                                                    <img src="/assets/images/users/avatar-4.jpg" className="avatar-lg rounded-circle"
                                                         alt="" />
                                                 </span>
                                                 <span className="flex-grow-1 text-muted">
@@ -222,7 +222,7 @@ export default function Topbar() {
                                         <div className="dropdown-item notification-item py-2 text-wrap" id="notification-4">
                                             <span className="d-flex align-items-center">
                                                 <span className="me-3 position-relative flex-shrink-0">
-                                                    <img src="assets/images/users/avatar-7.jpg" className="avatar-lg rounded-circle"
+                                                    <img src="/assets/images/users/avatar-7.jpg" className="avatar-lg rounded-circle"
                                                         alt="" />
                                                 </span>
                                                 <span className="flex-grow-1 text-muted">
@@ -245,7 +245,7 @@ export default function Topbar() {
                                         <div className="dropdown-item notification-item py-2 text-wrap" id="notification-5">
                                             <span className="d-flex align-items-center">
                                                 <span className="me-3 position-relative flex-shrink-0">
-                                                    <img src="assets/images/users/avatar-10.jpg" className="avatar-lg rounded-circle"
+                                                    <img src="/assets/images/users/avatar-10.jpg" className="avatar-lg rounded-circle"
                                                         alt="" />
                                                 </span>
                                                 <span className="flex-grow-1 text-muted">
@@ -286,19 +286,19 @@ export default function Topbar() {
                                         <div className="row g-0">
                                             <div className="col">
                                                 <a className="dropdown-icon-item" href="#">
-                                                    <img src="assets/images/brands/slack.svg" alt="slack" />
+                                                    <img src="/assets/images/brands/slack.svg" alt="slack" />
                                                     <span>Slack</span>
                                                 </a>
                                             </div>
                                             <div className="col">
                                                 <a className="dropdown-icon-item" href="#">
-                                                    <img src="assets/images/brands/gitlab.svg" alt="Github" />
+                                                    <img src="/assets/images/brands/gitlab.svg" alt="Github" />
                                                     <span>Gitlab</span>
                                                 </a>
                                             </div>
                                             <div className="col">
                                                 <a className="dropdown-icon-item" href="#">
-                                                    <img src="assets/images/brands/dribbble.svg" alt="dribbble" />
+                                                    <img src="/assets/images/brands/dribbble.svg" alt="dribbble" />
                                                     <span>Dribbble</span>
                                                 </a>
                                             </div>
@@ -307,19 +307,19 @@ export default function Topbar() {
                                         <div className="row g-0">
                                             <div className="col">
                                                 <a className="dropdown-icon-item" href="#">
-                                                    <img src="assets/images/brands/bitbucket.svg" alt="bitbucket" />
+                                                    <img src="/assets/images/brands/bitbucket.svg" alt="bitbucket" />
                                                     <span>Bitbucket</span>
                                                 </a>
                                             </div>
                                             <div className="col">
                                                 <a className="dropdown-icon-item" href="#">
-                                                    <img src="assets/images/brands/dropbox.svg" alt="dropbox" />
+                                                    <img src="/assets/images/brands/dropbox.svg" alt="dropbox" />
                                                     <span>Dropbox</span>
                                                 </a>
                                             </div>
                                             <div className="col">
                                                 <a className="dropdown-icon-item" href="#">
-                                                    <img src="assets/images/brands/google-cloud.svg" alt="G Suite" />
+                                                    <img src="/assets/images/brands/google-cloud.svg" alt="G Suite" />
                                                     <span>G Cloud</span>
                                                 </a>
                                             </div>
@@ -328,19 +328,19 @@ export default function Topbar() {
                                         <div className="row g-0">
                                             <div className="col">
                                                 <a className="dropdown-icon-item" href="#">
-                                                    <img src="assets/images/brands/aws.svg" alt="bitbucket" />
+                                                    <img src="/assets/images/brands/aws.svg" alt="bitbucket" />
                                                     <span>AWS</span>
                                                 </a>
                                             </div>
                                             <div className="col">
                                                 <a className="dropdown-icon-item" href="#">
-                                                    <img src="assets/images/brands/digital-ocean.svg" alt="dropbox" />
+                                                    <img src="/assets/images/brands/digital-ocean.svg" alt="dropbox" />
                                                     <span>Server</span>
                                                 </a>
                                             </div>
                                             <div className="col">
                                                 <a className="dropdown-icon-item" href="#">
-                                                    <img src="assets/images/brands/bootstrap.svg" alt="G Suite" />
+                                                    <img src="/assets/images/brands/bootstrap.svg" alt="G Suite" />
                                                     <span>Bootstrap</span>
                                                 </a>
                                             </div>
@@ -370,7 +370,7 @@ export default function Topbar() {
                             <div className="dropdown">
                                 <a className="topbar-link dropdown-toggle drop-arrow-none px-2" data-bs-toggle="dropdown"
                                     data-bs-offset="0,25" type="button" aria-haspopup="false" aria-expanded="false">
-                                    <img src="assets/images/users/avatar-1.jpg" width="32" className="rounded-circle me-lg-2 d-flex"
+                                    <img src="/assets/images/users/avatar-1.jpg" width="32" className="rounded-circle me-lg-2 d-flex"
                                         alt="user-image" />
                                     <span className="d-lg-flex flex-column gap-1 d-none">
                                         <h5 className="my-0">Maxine K.</h5>
