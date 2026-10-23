@@ -1,0 +1,21 @@
+HTTrack3.49-2+htsswf+htsjava launched on Thu, 11 Dec 2025 11:49:03 at https://coderthemes.com/highdmin/layouts/index.html +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" https://coderthemes.com/highdmin/layouts/index.html -O1 "F:\Personal Site\sinchai template theam" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+11:50:33	Warning: 	file not stored in cache due to bogus state (incomplete type with OK (200), size 0): https://apexcharts.com/samples/assets/series1000.js
+11:51:04	Error: 	"Not Found" (404) at link https://coderthemes.com/assets/images/dr-profile/dr-bg.jpg (from https://coderthemes.com/highdmin/layouts/assets/css/app.min.css)
+11:51:04	Error: 	"Not Found" (404) at link https://coderthemes.com/highdmin/layouts/assets/images/banner-1.jpg (from https://coderthemes.com/highdmin/layouts/assets/css/app.min.css)
+11:51:14	Error: 	"Not Found" (404) at link https://coderthemes.com/highdmin/layouts/auth-2fa.html (from https://coderthemes.com/highdmin/layouts/layouts-horizontal.html)
+11:51:14	Error: 	"Not Found" (404) at link https://coderthemes.com/highdmin/layouts/auth-account-deactivation.html (from https://coderthemes.com/highdmin/layouts/layouts-horizontal.html)
+11:51:14	Error: 	"Not Found" (404) at link https://coderthemes.com/highdmin/layouts/ui-ribbons.html (from https://coderthemes.com/highdmin/layouts/layouts-horizontal.html)
+11:51:14	Error: 	"Not Found" (404) at link https://coderthemes.com/highdmin/layouts/.tables-datatable.html (from https://coderthemes.com/highdmin/layouts/layouts-horizontal.html)
+11:51:17	Error: 	"Not Found" (404) at link https://coderthemes.com/highdmin/layouts/pages-profile.html (from https://coderthemes.com/highdmin/layouts/icons-tabler.html)
+11:51:17	Error: 	"Not Found" (404) at link https://coderthemes.com/highdmin/layouts/pages-gallery.html (from https://coderthemes.com/highdmin/layouts/icons-tabler.html)
+11:51:17	Error: 	"Not Found" (404) at link https://coderthemes.com/highdmin/layouts/pages-email-templates.html (from https://coderthemes.com/highdmin/layouts/icons-tabler.html)
+
+HTTrack Website Copier/3.49-2 mirror complete in 2 minutes 14 seconds : 293 links scanned, 283 files written (25105461 bytes overall) [10155805 bytes received at 75789 bytes/sec], 17334150 bytes transferred using HTTP compression in 208 files, ratio 13%, 19.5 requests per connection
+(9 errors, 1 warnings, 0 messages)
