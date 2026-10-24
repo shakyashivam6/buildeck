@@ -9,8 +9,8 @@ export default function AbhiLayout({ children }) {
                 <div className="col-xl-4 col-lg-5 col-md-6">
                     <div className="card overflow-hidden text-center h-100 p-xxl-4 p-3 mb-0">
                         <Link href="/" className="auth-brand mb-4">
-                            <img src="/assets/images/logo-dark.png" alt="dark logo" height="26" className="logo-dark" />
-                            <img src="/assets/images/logo.png" alt="logo light" height="26" className="logo-light" />
+                            <img src="/assets/images/logo.png" alt="dark logo" style={{ height: '7rem' }} className="logo-dark" />
+                            <img src="/assets/images/logo.png" alt="logo light" style={{ height: '7rem' }} className="logo-light" />
                         </Link>
 
                         {children}
@@ -18,7 +18,9 @@ export default function AbhiLayout({ children }) {
                         <p className="mt-auto mb-0">
                             {new Date().getFullYear()} © {appName} - By{' Abhishek '}
                             <span className="fw-bold text-decoration-underline text-uppercase text-reset fs-12">
+                                <a href="https://ferryinfotech.com/" target='_blank'>
                                 Ferry Infotech
+                                </a>
                             </span>
                         </p>
                     </div>

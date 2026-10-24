@@ -1,3 +1,10 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
+/* Sidebar submenu hover text fix */
+.side-nav .sub-menu .side-nav-link:hover,
+.side-nav .sub-menu .side-nav-link:hover .menu-text {
+    color: #02c0ce !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}

@@ -1,5 +1,23 @@
+import { Link, usePage } from "@inertiajs/react";
+import { useState, useEffect } from "react";
 
 export default function Topbar() {
+    const [isDarkMode, setIsDarkMode] = useState(false);
+    const { auth } = usePage().props;
+    const authUser = auth.user;
+
+    useEffect(() => {
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+        setIsDarkMode(currentTheme === 'dark');
+    }, []);
+
+    const toggleTheme = () => {
+        const nextTheme = isDarkMode ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-bs-theme', nextTheme);
+        setIsDarkMode(!isDarkMode);
+        sessionStorage.setItem('__HIGHDMIN_THEME__', nextTheme);
+    };
+
     return (
         <>
             {/* Topbar Start */}
@@ -43,70 +61,6 @@ export default function Topbar() {
                     </div>
 
                     <div className="d-flex align-items-center gap-2">
-
-                        {/* Search for small devices */}
-                        <div className="topbar-item d-flex d-xl-none">
-                            <button className="topbar-link" data-bs-toggle="modal" data-bs-target="#searchModal" type="button">
-                                <i className="ri-search-line fs-22"></i>
-                            </button>
-                        </div>
-
-                        {/* Button Trigger Search Modal */}
-                        <div className="topbar-search d-none d-xl-flex gap-2 me-2 align-items-center" data-bs-toggle="modal"
-                            data-bs-target="#searchModal" type="button">
-                            <i className="ri-search-line fs-18"></i>
-                            <span className="me-2">Search something..</span>
-                        </div>
-
-                        {/* Language Dropdown */}
-                        <div className="topbar-item">
-                            <div className="dropdown">
-                                <button className="topbar-link" data-bs-toggle="dropdown" data-bs-offset="0,32" type="button"
-                                    aria-haspopup="false" aria-expanded="false">
-                                    <img src="/assets/images/flags/us.svg" alt="user-image" className="w-100 rounded" height="18"
-                                        id="selected-language-image" />
-                                </button>
-
-                                <div className="dropdown-menu dropdown-menu-end">
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item" data-translator-lang="en">
-                                        <img src="/assets/images/flags/us.svg" alt="user-image" className="me-1 rounded" height="18"
-                                            data-translator-image /> <span className="align-middle">English</span>
-                                    </a>
-
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item" data-translator-lang="hi">
-                                        <img src="/assets/images/flags/in.svg" alt="user-image" className="me-1 rounded" height="18"
-                                            data-translator-image /> <span className="align-middle">Hindi</span>
-                                    </a>
-
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">
-                                        <img src="/assets/images/flags/de.svg" alt="user-image" className="me-1 rounded" height="18" />
-                                        <span className="align-middle">German</span>
-                                    </a>
-
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">
-                                        <img src="/assets/images/flags/it.svg" alt="user-image" className="me-1 rounded" height="18" />
-                                        <span className="align-middle" >Italian</span>
-                                    </a>
-
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">
-                                        <img src="/assets/images/flags/es.svg" alt="user-image" className="me-1 rounded" height="18" />
-                                        <span className="align-middle">Spanish</span>
-                                    </a>
-
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">
-                                        <img src="/assets/images/flags/ru.svg" alt="user-image" className="me-1 rounded" height="18" />
-                                        <span className="align-middle">Russian</span>
-                                    </a>
-
-                                </div>
-                            </div>
-                        </div>
 
                         {/* Notification Dropdown */}
                         <div className="topbar-item">
@@ -273,94 +227,10 @@ export default function Topbar() {
                             </div>
                         </div>
 
-                        {/* Apps Dropdown */}
-                        <div className="topbar-item d-none d-sm-flex">
-                            <div className="dropdown">
-                                <button className="topbar-link dropdown-toggle drop-arrow-none" data-bs-toggle="dropdown"
-                                    data-bs-offset="0,25" type="button" aria-haspopup="false" aria-expanded="false">
-                                    <i className="ri-apps-2-add-line fs-22"></i>
-                                </button>
-                                <div className="dropdown-menu dropdown-menu-end dropdown-menu-lg p-0">
-                                    <div className="p-2">
-                                        <div className="row g-0">
-                                            <div className="col">
-                                                <a className="dropdown-icon-item" href="#">
-                                                    <img src="/assets/images/brands/slack.svg" alt="slack" />
-                                                    <span>Slack</span>
-                                                </a>
-                                            </div>
-                                            <div className="col">
-                                                <a className="dropdown-icon-item" href="#">
-                                                    <img src="/assets/images/brands/gitlab.svg" alt="Github" />
-                                                    <span>Gitlab</span>
-                                                </a>
-                                            </div>
-                                            <div className="col">
-                                                <a className="dropdown-icon-item" href="#">
-                                                    <img src="/assets/images/brands/dribbble.svg" alt="dribbble" />
-                                                    <span>Dribbble</span>
-                                                </a>
-                                            </div>
-                                        </div>
-
-                                        <div className="row g-0">
-                                            <div className="col">
-                                                <a className="dropdown-icon-item" href="#">
-                                                    <img src="/assets/images/brands/bitbucket.svg" alt="bitbucket" />
-                                                    <span>Bitbucket</span>
-                                                </a>
-                                            </div>
-                                            <div className="col">
-                                                <a className="dropdown-icon-item" href="#">
-                                                    <img src="/assets/images/brands/dropbox.svg" alt="dropbox" />
-                                                    <span>Dropbox</span>
-                                                </a>
-                                            </div>
-                                            <div className="col">
-                                                <a className="dropdown-icon-item" href="#">
-                                                    <img src="/assets/images/brands/google-cloud.svg" alt="G Suite" />
-                                                    <span>G Cloud</span>
-                                                </a>
-                                            </div>
-                                        </div> {/* end row*/}
-
-                                        <div className="row g-0">
-                                            <div className="col">
-                                                <a className="dropdown-icon-item" href="#">
-                                                    <img src="/assets/images/brands/aws.svg" alt="bitbucket" />
-                                                    <span>AWS</span>
-                                                </a>
-                                            </div>
-                                            <div className="col">
-                                                <a className="dropdown-icon-item" href="#">
-                                                    <img src="/assets/images/brands/digital-ocean.svg" alt="dropbox" />
-                                                    <span>Server</span>
-                                                </a>
-                                            </div>
-                                            <div className="col">
-                                                <a className="dropdown-icon-item" href="#">
-                                                    <img src="/assets/images/brands/bootstrap.svg" alt="G Suite" />
-                                                    <span>Bootstrap</span>
-                                                </a>
-                                            </div>
-                                        </div> {/* end row*/}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Button Trigger Customizer Offcanvas */}
-                        <div className="topbar-item d-none d-sm-flex">
-                            <button className="topbar-link" data-bs-toggle="offcanvas" data-bs-target="#theme-settings-offcanvas"
-                                type="button">
-                                <i className="ri-settings-4-line fs-22"></i>
-                            </button>
-                        </div>
-
                         {/* Light/Dark Mode Button */}
                         <div className="topbar-item d-none d-sm-flex">
-                            <button className="topbar-link" id="light-dark-mode" type="button">
-                                <i className="ri-moon-line fs-22"></i>
+                            <button className="topbar-link" id="light-dark-mode" type="button" onClick={toggleTheme}>
+                                <i className={isDarkMode ? "ri-sun-line fs-22" : "ri-moon-line fs-22"}></i>
                             </button>
                         </div>
 
@@ -372,7 +242,7 @@ export default function Topbar() {
                                     <img src="/assets/images/users/avatar-1.jpg" width="32" className="rounded-circle me-lg-2 d-flex"
                                         alt="user-image" />
                                     <span className="d-lg-flex flex-column gap-1 d-none">
-                                        <h5 className="my-0">Maxine K.</h5>
+                                        <h5 className="my-0">{authUser?.name}</h5>
                                     </span>
                                     <i className="ri-arrow-down-s-line d-none d-lg-block align-middle ms-2"></i>
                                 </a>
@@ -415,10 +285,20 @@ export default function Topbar() {
                                     </a>
 
                                     {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item active fw-semibold text-danger">
+
+                                    <Link
+                                        method="post"
+                                        as="button"
+                                        href={route('logout')}
+                                        className="dropdown-item active fw-semibold text-danger"
+                                    >
                                         <i className="ri-logout-box-line me-1 fs-16 align-middle"></i>
                                         <span className="align-middle">Sign Out</span>
-                                    </a>
+                                    </Link>
+                                    {/* <a href="javascript:void(0);" className="dropdown-item active fw-semibold text-danger">
+                                        <i className="ri-logout-box-line me-1 fs-16 align-middle"></i>
+                                        <span className="align-middle">Sign Out</span>
+                                    </a> */}
                                 </div>
                             </div>
                         </div>
@@ -427,7 +307,7 @@ export default function Topbar() {
                 {/* Topbar End */}
 
                 {/* Search Modal  */}
-                <div className="modal fade" id="searchModal" tabIndex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+                {/* <div className="modal fade" id="searchModal" tabIndex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
                     <div className="modal-dialog modal-lg">
                         <div className="modal-content bg-transparent">
                             <form>
@@ -442,7 +322,7 @@ export default function Topbar() {
                             </form>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </header>
         </>
     );
