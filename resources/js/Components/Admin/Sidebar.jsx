@@ -125,7 +125,7 @@ export default function Sidebar() {
                                             <span className="menu-text">Vendor</span>
                                         </Link>
                                     </li>
-                                    <li className="side-nav-item">
+                                    {/* <li className="side-nav-item">
                                         <a href="apps-invoice-details.html" className="side-nav-link" disabled>
                                             <span className="menu-text">View Invoice</span>
                                         </a>
@@ -134,7 +134,7 @@ export default function Sidebar() {
                                         <a href="apps-invoice-create.html" className="side-nav-link">
                                             <span className="menu-text">Create Invoice</span>
                                         </a>
-                                    </li>
+                                    </li> */}
                                 </ul>
                             </div>
                         </li>

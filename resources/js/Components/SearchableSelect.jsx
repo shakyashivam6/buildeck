@@ -61,7 +61,7 @@ export default function SearchableSelect({
             className={`searchable-select position-relative ${disabled ? 'opacity-50' : ''}`}
             ref={dropdownRef}
         >
-            {/* Display Box (Like Form Select) */}
+            {/* Display Box: Inherits theme background and text from Bootstrap .form-control */}
             <div
                 id={id}
                 role="button"
@@ -69,17 +69,16 @@ export default function SearchableSelect({
                 onClick={() => {
                     if (!disabled) setIsOpen(!isOpen);
                 }}
-                className={`form-control d-flex justify-content-between align-items-center select2-selection ${
+                className={`form-control d-flex justify-content-between align-items-center ${
                     error ? 'is-invalid border-danger' : ''
                 } ${isOpen ? 'border-primary' : ''}`}
                 style={{
                     cursor: disabled ? 'not-allowed' : 'pointer',
                     userSelect: 'none',
                     minHeight: '38px',
-                    backgroundColor: disabled ? '#f8f9fa' : '#fff',
                 }}
             >
-                <span className={selectedItem ? 'text-dark' : 'text-muted'}>
+                <span className={selectedItem ? 'text-body' : 'text-muted'}>
                     {selectedItem ? selectedItem[nameKey] : placeholder}
                 </span>
                 <i
@@ -87,20 +86,22 @@ export default function SearchableSelect({
                 ></i>
             </div>
 
-            {/* Dropdown Menu with Search Box (Select2 Style) */}
+            {/* Dropdown Menu (Bootstrap .dropdown-menu automatically supports Light & Dark themes) */}
             {isOpen && (
                 <div
-                    className="position-absolute start-0 end-0 bg-white border border-top-0 rounded-bottom shadow-lg"
+                    className="dropdown-menu show w-100 p-0 shadow-lg border"
                     style={{
                         zIndex: 1060,
+                        position: 'absolute',
                         top: '100%',
-                        marginTop: '-1px',
+                        left: 0,
+                        marginTop: '2px',
                     }}
                 >
                     {/* Search Input Box */}
-                    <div className="p-2 border-bottom bg-light">
+                    <div className="p-2 border-bottom bg-body-tertiary">
                         <div className="input-group input-group-sm">
-                            <span className="input-group-text bg-white border-end-0 text-muted">
+                            <span className="input-group-text border-end-0 text-muted">
                                 <i className="ri-search-line"></i>
                             </span>
                             <input
@@ -116,8 +117,8 @@ export default function SearchableSelect({
                     </div>
 
                     {/* Options List */}
-                    <ul
-                        className="list-unstyled mb-0"
+                    <div
+                        className="py-1"
                         style={{
                             maxHeight: '220px',
                             overflowY: 'auto',
@@ -128,48 +129,31 @@ export default function SearchableSelect({
                                 const isSelected =
                                     String(opt[valueKey]) === String(value);
                                 return (
-                                    <li
+                                    <button
                                         key={opt[valueKey]}
+                                        type="button"
                                         onClick={() => handleSelect(opt)}
-                                        className={`px-3 py-2 cursor-pointer d-flex justify-content-between align-items-center select2-result ${
-                                            isSelected
-                                                ? 'bg-primary text-white fw-semibold'
-                                                : 'text-dark hover-bg-light'
+                                        className={`dropdown-item py-2 px-3 d-flex justify-content-between align-items-center ${
+                                            isSelected ? 'active' : ''
                                         }`}
-                                        style={{
-                                            cursor: 'pointer',
-                                            fontSize: '13.5px',
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            if (!isSelected) {
-                                                e.currentTarget.style.backgroundColor =
-                                                    '#f1f5f7';
-                                            }
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            if (!isSelected) {
-                                                e.currentTarget.style.backgroundColor =
-                                                    'transparent';
-                                            }
-                                        }}
+                                        style={{ fontSize: '13.5px' }}
                                     >
                                         <span>{opt[nameKey]}</span>
                                         {isSelected && (
                                             <i className="ri-check-line ms-2"></i>
                                         )}
-                                    </li>
+                                    </button>
                                 );
                             })
                         ) : (
-                            <li className="px-3 py-3 text-center text-muted fs-13">
+                            <div className="px-3 py-3 text-center text-muted fs-13">
                                 <i className="ri-inbox-line d-block fs-18 mb-1"></i>
                                 No results found
-                            </li>
+                            </div>
                         )}
-                    </ul>
+                    </div>
                 </div>
             )}
         </div>
     );
 }
-
