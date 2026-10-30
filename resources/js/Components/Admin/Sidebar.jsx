@@ -104,29 +104,29 @@ export default function Sidebar() {
                         <li className="side-nav-title">Navigation</li>
 
                         <li className="side-nav-item">
-                            <a href={ route('dashboard') } className="side-nav-link">
+                            <Link href={route('dashboard')} className="side-nav-link">
                                 <span className="menu-icon"><i className="ri-dashboard-3-line"></i></span>
                                 <span className="menu-text"> Dashboard </span>
                                 <span className="badge bg-danger rounded-pill">5</span>
-                            </a>
+                            </Link>
                         </li>
 
                         <li className="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarInvoice" aria-expanded="false" aria-controls="sidebarInvoice"
+                            <a data-bs-toggle="collapse" href="#sidebarOnboard" aria-expanded="false" aria-controls="sidebarOnboard"
                                 className="side-nav-link">
                                 <span className="menu-icon"><i className="ri-file-paper-line"></i></span>
-                                <span className="menu-text"> Invoice</span>
+                                <span className="menu-text"> Onboard Users</span>
                                 <span className="menu-arrow"></span>
                             </a>
-                            <div className="collapse" id="sidebarInvoice">
+                            <div className="collapse" id="sidebarOnboard">
                                 <ul className="sub-menu">
                                     <li className="side-nav-item">
-                                        <a href="apps-invoices.html" className="side-nav-link">
-                                            <span className="menu-text">Invoices</span>
-                                        </a>
+                                        <Link href={ route('admin.onboard.vendor') } className="side-nav-link">
+                                            <span className="menu-text">Vendor</span>
+                                        </Link>
                                     </li>
                                     <li className="side-nav-item">
-                                        <a href="apps-invoice-details.html" className="side-nav-link">
+                                        <a href="apps-invoice-details.html" className="side-nav-link" disabled>
                                             <span className="menu-text">View Invoice</span>
                                         </a>
                                     </li>
