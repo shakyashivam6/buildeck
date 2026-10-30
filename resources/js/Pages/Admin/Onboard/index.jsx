@@ -1,4 +1,5 @@
 import AdminLayout from "@/Layouts/AdminLayout";
+import SearchableSelect from "@/Components/SearchableSelect";
 import { Head, useForm, usePage, router } from "@inertiajs/react";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -568,47 +569,44 @@ export default function Index({ states = [], vendors = { data: [] } }) {
                                             <label htmlFor="state_id" className="form-label">
                                                 State <span className="text-danger">*</span>
                                             </label>
-                                            <select
+                                            <SearchableSelect
                                                 id="state_id"
-                                                className={`form-select ${errors.state_id ? 'is-invalid' : ''}`}
+                                                placeholder="-- Select State --"
+                                                options={states}
                                                 value={data.state_id}
-                                                onChange={handleStateChange}
-                                            >
-                                                <option value="">-- Select State --</option>
-                                                {states.map((st) => (
-                                                    <option key={st.id} value={st.id}>
-                                                        {st.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            {errors.state_id && <div className="invalid-feedback">{errors.state_id}</div>}
+                                                onChange={(selectedStateId) => {
+                                                    setData((prev) => ({
+                                                        ...prev,
+                                                        state_id: selectedStateId,
+                                                        city_id: '',
+                                                    }));
+                                                    fetchCities(selectedStateId);
+                                                }}
+                                                error={errors.state_id}
+                                            />
+                                            {errors.state_id && <div className="text-danger fs-12 mt-1">{errors.state_id}</div>}
                                         </div>
 
                                         <div className="col-md-4">
                                             <label htmlFor="city_id" className="form-label">
                                                 City <span className="text-danger">*</span>
                                             </label>
-                                            <select
+                                            <SearchableSelect
                                                 id="city_id"
-                                                className={`form-select ${errors.city_id ? 'is-invalid' : ''}`}
-                                                value={data.city_id}
-                                                onChange={(e) => setData('city_id', e.target.value)}
-                                                disabled={!data.state_id || loadingCities}
-                                            >
-                                                <option value="">
-                                                    {loadingCities
+                                                placeholder={
+                                                    loadingCities
                                                         ? 'Loading cities...'
                                                         : !data.state_id
                                                         ? '-- Select State First --'
-                                                        : '-- Select City --'}
-                                                </option>
-                                                {cities.map((ct) => (
-                                                    <option key={ct.id} value={ct.id}>
-                                                        {ct.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            {errors.city_id && <div className="invalid-feedback">{errors.city_id}</div>}
+                                                        : '-- Select City --'
+                                                }
+                                                options={cities}
+                                                value={data.city_id}
+                                                onChange={(selectedCityId) => setData('city_id', selectedCityId)}
+                                                disabled={!data.state_id || loadingCities}
+                                                error={errors.city_id}
+                                            />
+                                            {errors.city_id && <div className="text-danger fs-12 mt-1">{errors.city_id}</div>}
                                         </div>
 
                                         <div className="col-md-4">
