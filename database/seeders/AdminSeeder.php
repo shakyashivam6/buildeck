@@ -17,7 +17,7 @@ class AdminSeeder extends Seeder
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
 
         $admin = User::firstOrCreate(
-            ['email' => 'buildeck@gmail.com'],
+            ['email' => 'admin@buildeck.com'],
             [
                 'name' => 'BuilDeck-Admin',
                 'mobile' => '7985941363',
