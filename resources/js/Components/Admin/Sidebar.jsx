@@ -9,14 +9,10 @@ export default function Sidebar() {
             title: 'Dashboard',
             icon: 'ri-dashboard-3-line',
             route: 'dashboard',
-            // badge: {
-            //     text: '5',
-            //     className: 'badge bg-danger rounded-pill',
-            // },
         },
         {
             title: 'Onboard Users',
-            icon: 'ri-file-paper-line',
+            icon: 'ri-user-follow-line',
             id: 'sidebarOnboard',
             activePattern: 'admin.onboard.*',
             children: [
@@ -31,14 +27,26 @@ export default function Sidebar() {
             ],
         },
         {
-            title: 'Item Details',
-            icon: 'ri-file-paper-line',
-            id: 'sidebarItem',
-            activePattern: 'admin.item.*',
+            title: 'Product Master',
+            icon: 'ri-store-2-line',
+            id: 'sidebarCatalog',
+            activePattern: 'admin.catalog.*',
             children: [
                 {
-                    title: 'Item',
-                    route: 'admin.item',
+                    title: 'Categories & Sub-Categories',
+                    route: 'admin.catalog.categories',
+                },
+                {
+                    title: 'Units of Measure (UOM)',
+                    route: 'admin.catalog.uoms',
+                },
+                {
+                    title: 'Brands Master',
+                    route: 'admin.catalog.brands',
+                },
+                {
+                    title: 'Products & Multi-UOM',
+                    route: 'admin.catalog.products',
                 },
             ],
         },

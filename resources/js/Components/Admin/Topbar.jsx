@@ -66,17 +66,17 @@ export default function Topbar({ title, breadcrumbs }) {
                     <div className="d-flex align-items-center gap-2">
 
                         {/* Brand Logo */}
-                        <a href="index.html" className="logo">
+                        <Link href={route('dashboard')} className="logo">
                             <span className="logo-light">
-                                <span className="logo-lg"><img src="/assets/images/logo.png" alt="logo" /></span>
-                                <span className="logo-sm"><img src="/assets/images/logo-sm.png" alt="small logo" /></span>
+                                <span className="logo-lg"><img src="/assets/images/light-logo.png" alt="logo" style={{ height: '2.5rem', objectFit: 'contain' }} /></span>
+                                <span className="logo-sm"><img src="/assets/images/favicon.svg" alt="small logo" style={{ height: '2rem' }} /></span>
                             </span>
 
                             <span className="logo-dark">
-                                <span className="logo-lg"><img src="/assets/images/logo-dark.png" alt="dark logo" /></span>
-                                <span className="logo-sm"><img src="/assets/images/logo-sm.png" alt="small logo" /></span>
+                                <span className="logo-lg"><img src="/assets/images/dark-logo.png" alt="dark logo" style={{ height: '2.5rem', objectFit: 'contain' }} /></span>
+                                <span className="logo-sm"><img src="/assets/images/favicon.svg" alt="small logo" style={{ height: '2rem' }} /></span>
                             </span>
-                        </a>
+                        </Link>
 
                         {/* Topbar Page Title & Breadcrumbs */}
                         <div className="topbar-item d-flex align-items-center">
@@ -84,19 +84,31 @@ export default function Topbar({ title, breadcrumbs }) {
                                 <h4 className="fs-18 fw-bold text-white mb-0 lh-sm">{currentTitle}</h4>
                                 <nav aria-label="breadcrumb">
                                     <ol className="breadcrumb mb-0 p-0 fs-12 text-white-50" style={{ gap: '4px' }}>
-                                        {currentBreadcrumbs.map((crumb, idx) => (
-                                            <li
-                                                key={idx}
-                                                className={`d-flex align-items-center ${
-                                                    idx === currentBreadcrumbs.length - 1
-                                                        ? 'active text-white fw-medium'
-                                                        : 'text-white text-opacity-75'
-                                                }`}
-                                            >
-                                                {idx > 0 && <span className="me-1 opacity-75">&rsaquo;</span>}
-                                                <span>{crumb}</span>
-                                            </li>
-                                        ))}
+                                        {currentBreadcrumbs.map((crumb, idx) => {
+                                            const label = typeof crumb === 'object' && crumb !== null ? (crumb.label || '') : crumb;
+                                            const url = typeof crumb === 'object' && crumb !== null ? crumb.url : null;
+                                            const isLast = idx === currentBreadcrumbs.length - 1;
+
+                                            return (
+                                                <li
+                                                    key={idx}
+                                                    className={`d-flex align-items-center ${
+                                                        isLast
+                                                            ? 'active text-white fw-medium'
+                                                            : 'text-white text-opacity-75'
+                                                    }`}
+                                                >
+                                                    {idx > 0 && <span className="me-1 opacity-75">&rsaquo;</span>}
+                                                    {url && !isLast ? (
+                                                        <Link href={url} className="text-white-50 text-decoration-none hover-white">
+                                                            {label}
+                                                        </Link>
+                                                    ) : (
+                                                        <span>{label}</span>
+                                                    )}
+                                                </li>
+                                            );
+                                        })}
                                     </ol>
                                 </nav>
                             </div>

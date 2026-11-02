@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminSeeder::class,
             LocationsTableSeeder::class,
+            ProductMasterSeeder::class,
         ]);
     }
 }
