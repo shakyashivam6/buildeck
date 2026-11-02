@@ -101,7 +101,7 @@ export default function Topbar() {
 
                                     <div className="position-relative rounded-0" style={{ maxHeight: '300px' }} data-simplebar>
                                         {/* item*/}
-                                        <div className="dropdown-item notification-item py-2 text-wrap active" id="notification-1">
+                                        {/* <div className="dropdown-item notification-item py-2 text-wrap active" id="notification-1">
                                             <span className="d-flex align-items-center">
                                                 <span className="me-3 position-relative flex-shrink-0">
                                                     <img src="/assets/images/users/avatar-2.jpg" className="avatar-lg rounded-circle"
@@ -121,10 +121,10 @@ export default function Topbar() {
                                                     </button>
                                                 </span>
                                             </span>
-                                        </div>
+                                        </div> */}
 
                                         {/* item*/}
-                                        <div className="dropdown-item notification-item py-2 text-wrap" id="notification-2">
+                                        {/* <div className="dropdown-item notification-item py-2 text-wrap" id="notification-2">
                                             <span className="d-flex align-items-center">
                                                 <span className="me-3 position-relative flex-shrink-0">
                                                     <img src="/assets/images/users/avatar-4.jpg" className="avatar-lg rounded-circle"
@@ -145,10 +145,10 @@ export default function Topbar() {
                                                     </button>
                                                 </span>
                                             </span>
-                                        </div>
+                                        </div> */}
 
                                         {/* item*/}
-                                        <div className="dropdown-item notification-item py-2 text-wrap" id="notification-3">
+                                        {/* <div className="dropdown-item notification-item py-2 text-wrap" id="notification-3">
                                             <span className="d-flex align-items-center">
                                                 <div className="avatar-lg flex-shrink-0 me-3">
                                                     <span className="avatar-title bg-success-subtle text-success rounded-circle fs-22">
@@ -169,10 +169,10 @@ export default function Topbar() {
                                                     </button>
                                                 </span>
                                             </span>
-                                        </div>
+                                        </div> */}
 
                                         {/* item*/}
-                                        <div className="dropdown-item notification-item py-2 text-wrap" id="notification-4">
+                                        {/* <div className="dropdown-item notification-item py-2 text-wrap" id="notification-4">
                                             <span className="d-flex align-items-center">
                                                 <span className="me-3 position-relative flex-shrink-0">
                                                     <img src="/assets/images/users/avatar-7.jpg" className="avatar-lg rounded-circle"
@@ -192,10 +192,10 @@ export default function Topbar() {
                                                     </button>
                                                 </span>
                                             </span>
-                                        </div>
+                                        </div> */}
 
                                         {/* item*/}
-                                        <div className="dropdown-item notification-item py-2 text-wrap" id="notification-5">
+                                        {/* <div className="dropdown-item notification-item py-2 text-wrap" id="notification-5">
                                             <span className="d-flex align-items-center">
                                                 <span className="me-3 position-relative flex-shrink-0">
                                                     <img src="/assets/images/users/avatar-10.jpg" className="avatar-lg rounded-circle"
@@ -215,14 +215,14 @@ export default function Topbar() {
                                                     </button>
                                                 </span>
                                             </span>
-                                        </div>
+                                        </div> */}
                                     </div>
 
                                     {/* All*/}
-                                    <a href="javascript:void(0);"
+                                    <Link href="javascript:void(0);"
                                         className="dropdown-item position-absolute bottom-0 notification-item text-center text-reset text-decoration-underline fw-bold notify-item border-top border-light py-2">
                                         View All
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -259,30 +259,30 @@ export default function Topbar() {
                                     </a>
 
                                     {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">
+                                    {/* <a href="javascript:void(0);" className="dropdown-item">
                                         <i className="ri-wallet-3-line me-1 fs-16 align-middle"></i>
                                         <span className="align-middle">Wallet : <span className="fw-semibold">$89.25k</span></span>
-                                    </a>
+                                    </a> */}
 
                                     {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">
+                                    {/* <a href="javascript:void(0);" className="dropdown-item">
                                         <i className="ri-settings-2-line me-1 fs-16 align-middle"></i>
                                         <span className="align-middle">Settings</span>
-                                    </a>
+                                    </a> */}
 
                                     {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">
+                                    {/* <a href="javascript:void(0);" className="dropdown-item">
                                         <i className="ri-question-line me-1 fs-16 align-middle"></i>
                                         <span className="align-middle">Support</span>
-                                    </a>
+                                    </a> */}
 
                                     <div className="dropdown-divider"></div>
 
                                     {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">
+                                    {/* <a href="javascript:void(0);" className="dropdown-item">
                                         <i className="ri-lock-line me-1 fs-16 align-middle"></i>
                                         <span className="align-middle">Lock Screen</span>
-                                    </a>
+                                    </a> */}
 
                                     {/* item*/}
 
@@ -295,10 +295,6 @@ export default function Topbar() {
                                         <i className="ri-logout-box-line me-1 fs-16 align-middle"></i>
                                         <span className="align-middle">Sign Out</span>
                                     </Link>
-                                    {/* <a href="javascript:void(0);" className="dropdown-item active fw-semibold text-danger">
-                                        <i className="ri-logout-box-line me-1 fs-16 align-middle"></i>
-                                        <span className="align-middle">Sign Out</span>
-                                    </a> */}
                                 </div>
                             </div>
                         </div>
