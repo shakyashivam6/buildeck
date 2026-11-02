@@ -15,7 +15,7 @@ use Illuminate\Validation\Rule;
 class CustomerAuthController extends Controller
 {
     /**
-     * Customer registration API.
+     * Submit customer onboarding request.
      */
     public function register(Request $request): JsonResponse
     {
@@ -23,16 +23,18 @@ class CustomerAuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'mobile' => ['required', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
-            'password' => ['required', 'string', 'min:6'],
             'address' => ['nullable', 'string'],
-            'state_id' => ['nullable', 'exists:locations,id'],
-            'city_id' => ['nullable', 'exists:locations,id'],
+            'state_id' => ['required', 'exists:locations,id'],
+            'city_id' => ['required', 'exists:locations,id'],
             'zip' => ['nullable', 'string', 'max:10'],
             'lat' => ['nullable', 'numeric'],
             'long' => ['nullable', 'numeric'],
             'aadhaar' => ['nullable', 'string', 'max:20'],
             'pan' => ['nullable', 'string', 'max:15'],
             'profile_pic' => ['nullable', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'aadhaar_doc' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'pan_doc' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'password' => ['nullable', 'string', 'min:6'],
         ]);
 
         if ($validator->fails()) {
@@ -45,26 +47,54 @@ class CustomerAuthController extends Controller
             ], 422);
         }
 
-        // Check if user already exists with this mobile
-        $existingUser = User::where('mobile', $request->mobile)->first();
+        // Check if customer already exists with this mobile
+        $existingCustomer = User::where('mobile', $request->mobile)->first();
 
-        if ($existingUser) {
-            return response()->json([
-                'auth_status' => false,
-                'res' => 'error',
-                'msg' => 'A user account already exists with this mobile number. Please login.',
-                'data' => [],
-                'token_type' => 'Bearer',
-            ], 409);
+        if ($existingCustomer) {
+            if ($existingCustomer->role === 'customer' && $existingCustomer->status === 'approved') {
+                return response()->json([
+                    'auth_status' => false,
+                    'res' => 'error',
+                    'msg' => 'An approved customer account already exists with this mobile number. Please login.',
+                    'data' => [],
+                    'token_type' => 'Bearer',
+                ], 409);
+            }
+
+            if ($existingCustomer->role === 'customer' && $existingCustomer->status === 'pending') {
+                return response()->json([
+                    'auth_status' => false,
+                    'res' => 'error',
+                    'msg' => 'Your onboarding request has already been submitted and is currently pending admin review.',
+                    'data' => [
+                        'id' => $existingCustomer->id,
+                        'name' => $existingCustomer->name,
+                        'mobile' => $existingCustomer->mobile,
+                        'status' => $existingCustomer->status,
+                    ],
+                    'token_type' => 'Bearer',
+                ], 409);
+            }
+
+            if ($existingCustomer->role !== 'customer') {
+                return response()->json([
+                    'auth_status' => false,
+                    'res' => 'error',
+                    'msg' => "This mobile number is already registered under a different role ({$existingCustomer->role}).",
+                    'data' => [],
+                    'token_type' => 'Bearer',
+                ], 409);
+            }
         }
 
+        // Check if email already exists
         if ($request->filled('email')) {
             $existingEmail = User::where('email', $request->email)->first();
             if ($existingEmail) {
                 return response()->json([
                     'auth_status' => false,
                     'res' => 'error',
-                    'msg' => 'A user account already exists with this email address.',
+                    'msg' => 'An account with this email address already exists.',
                     'data' => [],
                     'token_type' => 'Bearer',
                 ], 409);
@@ -73,13 +103,22 @@ class CustomerAuthController extends Controller
 
         $data = $validator->validated();
 
+        // Handle document file uploads
         if ($request->hasFile('profile_pic')) {
             $data['profile_pic'] = $request->file('profile_pic')->store('customer_documents', 'public');
         }
+        if ($request->hasFile('aadhaar_doc')) {
+            $data['aadhaar_doc'] = $request->file('aadhaar_doc')->store('customer_documents', 'public');
+        }
+        if ($request->hasFile('pan_doc')) {
+            $data['pan_doc'] = $request->file('pan_doc')->store('customer_documents', 'public');
+        }
 
         $data['role'] = 'customer';
-        $data['status'] = 'approved';
-        $data['password'] = Hash::make($data['password']);
+        $data['status'] = 'pending';
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        }
 
         $user = User::create($data);
 
@@ -89,30 +128,72 @@ class CustomerAuthController extends Controller
             $user->assignRole('customer');
         }
 
-        $token = $user->createToken('customer-mobile-token')->plainTextToken;
+        return response()->json([
+            'auth_status' => false,
+            'res' => 'success',
+            'msg' => 'Customer onboarding request submitted successfully. Admin will review and approve your account.',
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'mobile' => $user->mobile,
+                'email' => $user->email,
+                'status' => $user->status,
+                'city' => $user->city?->name,
+                'state' => $user->state?->name,
+                'created_at' => $user->created_at,
+            ],
+            'token_type' => 'Bearer',
+        ], 201);
+    }
+
+    /**
+     * Check customer onboarding status by mobile number.
+     */
+    public function checkStatus(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile' => ['required', 'string'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'auth_status' => false,
+                'res' => 'error',
+                'msg' => $validator->errors()->first(),
+                'data' => $validator->errors(),
+                'token_type' => 'Bearer',
+            ], 422);
+        }
+
+        $user = User::where('mobile', $request->mobile)
+            ->where('role', 'customer')
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'auth_status' => false,
+                'res' => 'error',
+                'msg' => 'No customer onboarding request found for this mobile number.',
+                'data' => [],
+                'token_type' => 'Bearer',
+            ], 404);
+        }
 
         return response()->json([
-            'auth_status' => true,
+            'auth_status' => false,
             'res' => 'success',
-            'msg' => 'Customer registered successfully.',
-            'token_type' => 'Bearer',
+            'msg' => 'Customer onboarding status fetched successfully.',
             'data' => [
-                'token' => $token,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'mobile' => $user->mobile,
-                    'role' => $user->role,
-                    'status' => $user->status,
-                    'address' => $user->address,
-                    'city_id' => $user->city_id,
-                    'state_id' => $user->state_id,
-                    'zip' => $user->zip,
-                    'profile_pic' => $user->profile_pic ? asset('storage/' . $user->profile_pic) : null,
-                ],
+                'id' => $user->id,
+                'name' => $user->name,
+                'mobile' => $user->mobile,
+                'email' => $user->email,
+                'status' => $user->status,
+                'is_approved' => $user->status === 'approved',
+                'created_at' => $user->created_at,
             ],
-        ], 201);
+            'token_type' => 'Bearer',
+        ], 200);
     }
 
     /**
@@ -135,9 +216,13 @@ class CustomerAuthController extends Controller
             ], 422);
         }
 
-        $user = User::where('mobile', $request->login)
-            ->orWhere('email', $request->login)
-            ->first();
+        // Find customer by mobile or email
+        $user = User::where(function ($query) use ($request) {
+            $query->where('mobile', $request->login)
+                  ->orWhere('email', $request->login);
+        })
+        ->where('role', 'customer')
+        ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
@@ -149,22 +234,15 @@ class CustomerAuthController extends Controller
             ], 401);
         }
 
-        if ($user->role !== 'customer') {
-            return response()->json([
-                'auth_status' => false,
-                'res' => 'error',
-                'msg' => 'Access denied. Only registered customers can login here.',
-                'data' => [],
-                'token_type' => 'Bearer',
-            ], 403);
-        }
-
+        // Verify account approval status
         if ($user->status !== 'approved') {
             return response()->json([
                 'auth_status' => false,
                 'res' => 'error',
-                'msg' => 'Your customer account is currently inactive or pending approval.',
-                'data' => [],
+                'msg' => 'Your customer account is pending admin approval. You can login once approved.',
+                'data' => [
+                    'status' => $user->status,
+                ],
                 'token_type' => 'Bearer',
             ], 403);
         }
@@ -299,4 +377,3 @@ class CustomerAuthController extends Controller
         ], 200);
     }
 }
-
