@@ -57,7 +57,14 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         // Categories & Sub-Categories
         Route::get('categories', [CategoryController::class, 'index'])->name('categories');
         Route::post('categories', [CategoryController::class, 'storeCategory'])->name('categories.store');
+        Route::post('categories/{category}', [CategoryController::class, 'updateCategory'])->name('categories.update');
+        Route::post('categories/{category}/toggle-status', [CategoryController::class, 'toggleCategoryStatus'])->name('categories.toggle-status');
+        Route::delete('categories/{category}', [CategoryController::class, 'destroyCategory'])->name('categories.destroy');
+
         Route::post('sub-categories', [CategoryController::class, 'storeSubCategory'])->name('sub-categories.store');
+        Route::post('sub-categories/{subCategory}', [CategoryController::class, 'updateSubCategory'])->name('sub-categories.update');
+        Route::post('sub-categories/{subCategory}/toggle-status', [CategoryController::class, 'toggleSubCategoryStatus'])->name('sub-categories.toggle-status');
+        Route::delete('sub-categories/{subCategory}', [CategoryController::class, 'destroySubCategory'])->name('sub-categories.destroy');
 
         // Units of Measure (UOM)
         Route::get('uoms', [UnitOfMeasureController::class, 'index'])->name('uoms');
