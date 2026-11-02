@@ -4,15 +4,63 @@ export default function Sidebar() {
     const { auth } = usePage().props;
     const authUser = auth.user;
 
+    const navItems = [
+        {
+            title: 'Dashboard',
+            icon: 'ri-dashboard-3-line',
+            route: 'dashboard',
+            badge: {
+                text: '5',
+                className: 'badge bg-danger rounded-pill',
+            },
+        },
+        {
+            title: 'Onboard Users',
+            icon: 'ri-file-paper-line',
+            id: 'sidebarOnboard',
+            activePattern: 'admin.onboard.*',
+            children: [
+                {
+                    title: 'Vendor',
+                    route: 'admin.onboard.vendor',
+                },
+            ],
+        },
+    ];
+
+    const isRouteActive = (routeName) => {
+        try {
+            return route().current(routeName);
+        } catch {
+            return false;
+        }
+    };
+
+    const isItemActive = (item) => {
+        if (item.activePattern && isRouteActive(item.activePattern)) {
+            return true;
+        }
+        if (item.route && isRouteActive(item.route)) {
+            return true;
+        }
+        if (item.children) {
+            return item.children.some(
+                (child) =>
+                    isRouteActive(child.route) ||
+                    (child.activePattern && isRouteActive(child.activePattern))
+            );
+        }
+        return false;
+    };
+
     return (
         <>
             {/* Menu */}
             {/* Sidenav Menu Start */}
-            {/* a */}
             <div className="sidenav-menu">
 
                 {/* Brand Logo */}
-                <a href="index.html" className="logo">
+                <Link href={route('dashboard')} className="logo">
                     <span className="logo-light">
                         <span className="logo-lg"><img src="/assets/images/logo.png" alt="logo" /></span>
                         <span className="logo-sm"><img src="/assets/images/logo-sm.png" alt="small logo" /></span>
@@ -22,7 +70,7 @@ export default function Sidebar() {
                         <span className="logo-lg"><img src="/assets/images/logo.png" style={{ height: '3rem' }} alt="dark logo" /></span>
                         <span className="logo-sm"><img src="/assets/images/logo-sm.png" alt="small logo" /></span>
                     </span>
-                </a>
+                </Link>
 
                 {/* Sidebar Hover Menu Toggle Button */}
                 <button className="button-sm-hover">
@@ -103,41 +151,69 @@ export default function Sidebar() {
                     <ul className="side-nav">
                         <li className="side-nav-title">Navigation</li>
 
-                        <li className="side-nav-item">
-                            <Link href={route('dashboard')} className="side-nav-link">
-                                <span className="menu-icon"><i className="ri-dashboard-3-line"></i></span>
-                                <span className="menu-text"> Dashboard </span>
-                                <span className="badge bg-danger rounded-pill">5</span>
-                            </Link>
-                        </li>
+                        {navItems.map((item, index) => {
+                            const active = isItemActive(item);
 
-                        <li className="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarOnboard" aria-expanded="false" aria-controls="sidebarOnboard"
-                                className="side-nav-link">
-                                <span className="menu-icon"><i className="ri-file-paper-line"></i></span>
-                                <span className="menu-text"> Onboard Users</span>
-                                <span className="menu-arrow"></span>
-                            </a>
-                            <div className="collapse" id="sidebarOnboard">
-                                <ul className="sub-menu">
-                                    <li className="side-nav-item">
-                                        <Link href={ route('admin.onboard.vendor') } className="side-nav-link">
-                                            <span className="menu-text">Vendor</span>
-                                        </Link>
-                                    </li>
-                                    {/* <li className="side-nav-item">
-                                        <a href="apps-invoice-details.html" className="side-nav-link" disabled>
-                                            <span className="menu-text">View Invoice</span>
+                            if (item.children && item.children.length > 0) {
+                                return (
+                                    <li key={item.id || index} className={`side-nav-item ${active ? 'active' : ''}`}>
+                                        <a
+                                            data-bs-toggle="collapse"
+                                            href={`#${item.id}`}
+                                            aria-expanded={active ? 'true' : 'false'}
+                                            aria-controls={item.id}
+                                            className={`side-nav-link ${active ? 'active' : ''}`}
+                                        >
+                                            <span className="menu-icon"><i className={item.icon}></i></span>
+                                            <span className="menu-text"> {item.title}</span>
+                                            <span className="menu-arrow"></span>
                                         </a>
+                                        <div className={`collapse ${active ? 'show' : ''}`} id={item.id}>
+                                            <ul className="sub-menu">
+                                                {item.children.map((child, cIndex) => {
+                                                    const childActive =
+                                                        isRouteActive(child.route) ||
+                                                        (child.activePattern && isRouteActive(child.activePattern));
+                                                    return (
+                                                        <li
+                                                            key={child.route || cIndex}
+                                                            className={`side-nav-item ${childActive ? 'active' : ''}`}
+                                                        >
+                                                            <Link
+                                                                href={route(child.route)}
+                                                                className={`side-nav-link ${childActive ? 'active text-info fw-semibold' : ''}`}
+                                                            >
+                                                                <span className="menu-text d-flex align-items-center gap-2">
+                                                                    {childActive && (
+                                                                        <span
+                                                                            className="badge rounded-pill bg-info p-1"
+                                                                            style={{ width: 6, height: 6 }}
+                                                                        ></span>
+                                                                    )}
+                                                                    {child.title}
+                                                                </span>
+                                                            </Link>
+                                                        </li>
+                                                    );
+                                                })}
+                                            </ul>
+                                        </div>
                                     </li>
-                                    <li className="side-nav-item">
-                                        <a href="apps-invoice-create.html" className="side-nav-link">
-                                            <span className="menu-text">Create Invoice</span>
-                                        </a>
-                                    </li> */}
-                                </ul>
-                            </div>
-                        </li>
+                                );
+                            }
+
+                            return (
+                                <li key={item.route || index} className={`side-nav-item ${active ? 'active' : ''}`}>
+                                    <Link href={route(item.route)} className={`side-nav-link ${active ? 'active' : ''}`}>
+                                        <span className="menu-icon"><i className={item.icon}></i></span>
+                                        <span className="menu-text"> {item.title} </span>
+                                        {item.badge && (
+                                            <span className={item.badge.className}>{item.badge.text}</span>
+                                        )}
+                                    </Link>
+                                </li>
+                            );
+                        })}
                     </ul>
                     <div className="clearfix"></div>
                 </div>
