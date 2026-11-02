@@ -30,6 +30,18 @@ export default function Sidebar() {
                 },
             ],
         },
+        {
+            title: 'Item Details',
+            icon: 'ri-file-paper-line',
+            id: 'sidebarItem',
+            activePattern: 'admin.item.*',
+            children: [
+                {
+                    title: 'Item',
+                    route: 'admin.item',
+                },
+            ],
+        },
     ];
 
     const isRouteActive = (routeName) => {

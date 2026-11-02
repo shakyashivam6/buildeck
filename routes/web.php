@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Onboard\CustomerController;
 use App\Http\Controllers\Admin\Onboard\VendorController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Item\ItemController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Support\SupportController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +44,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('customers/{customer}', [CustomerController::class, 'update'])->name('customer.update');
     Route::post('customers/{customer}/status', [CustomerController::class, 'updateStatus'])->name('customer.status');
     Route::post('customers/{customer}/generate-credentials', [CustomerController::class, 'generateCredentials'])->name('customer.credentials');
+
+    Route::get('item', [ItemController::class, 'index'])->name('item');
 });
 
 require __DIR__.'/auth.php';
