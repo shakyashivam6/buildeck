@@ -3,7 +3,10 @@ import { Head } from "@inertiajs/react";
 
 export default function Dashboard({data}) {
     return (
-        <AdminLayout>
+        <AdminLayout
+            title="Dashboard"
+            breadcrumbs={['Admin', 'Dashboard']}
+        >
             {/* ============================================================== */}
             {/* Start Page Content here */}
             {/* ============================================================== */}

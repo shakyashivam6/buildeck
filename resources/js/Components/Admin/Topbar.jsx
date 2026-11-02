@@ -1,7 +1,7 @@
 import { Link, usePage } from "@inertiajs/react";
 import { useState, useEffect } from "react";
 
-export default function Topbar() {
+export default function Topbar({ title, breadcrumbs }) {
     const [isDarkMode, setIsDarkMode] = useState(false);
     const { auth } = usePage().props;
     const authUser = auth.user;
@@ -17,6 +17,46 @@ export default function Topbar() {
         setIsDarkMode(!isDarkMode);
         sessionStorage.setItem('__HIGHDMIN_THEME__', nextTheme);
     };
+
+    const getRouteMeta = () => {
+        try {
+            if (route().current('dashboard') || route().current('dashboard_01')) {
+                return {
+                    title: 'Dashboard',
+                    breadcrumbs: ['Admin', 'Dashboard'],
+                };
+            }
+            if (route().current('admin.onboard.vendor')) {
+                return {
+                    title: 'Vendors Management',
+                    breadcrumbs: ['Admin', 'Vendors', 'Onboard'],
+                };
+            }
+            if (route().current('admin.onboard.customer')) {
+                return {
+                    title: 'Customers Management',
+                    breadcrumbs: ['Admin', 'Customers', 'Onboard'],
+                };
+            }
+            if (route().current('profile.edit')) {
+                return {
+                    title: 'Profile Settings',
+                    breadcrumbs: ['User', 'Profile'],
+                };
+            }
+        } catch {
+            // fallback
+        }
+
+        return {
+            title: 'Dashboard',
+            breadcrumbs: ['Admin', 'Dashboard'],
+        };
+    };
+
+    const meta = getRouteMeta();
+    const currentTitle = title || meta.title;
+    const currentBreadcrumbs = breadcrumbs && breadcrumbs.length > 0 ? breadcrumbs : meta.breadcrumbs;
 
     return (
         <>
@@ -38,25 +78,28 @@ export default function Topbar() {
                             </span>
                         </a>
 
-                        {/* Sidebar Menu Toggle Button */}
-                        <button className="sidenav-toggle-button px-2">
-                            <i className="ri-menu-5-line fs-24"></i>
-                        </button>
-
-                        {/* Horizontal Menu Toggle Button */}
-                        <button className="topnav-toggle-button px-2" data-bs-toggle="collapse" data-bs-target="#topnav-menu-content">
-                            <i className="ri-menu-5-line fs-24"></i>
-                        </button>
-
-                        {/* Topbar Page Title */}
-                        <div className="topbar-item d-none d-md-flex">
-
-
-
-                            <div>
-                                <h4 className="page-title fs-18 fw-bold mb-0">Welcome!</h4>
+                        {/* Topbar Page Title & Breadcrumbs */}
+                        <div className="topbar-item d-flex align-items-center">
+                            <div className="d-flex flex-column justify-content-center py-1">
+                                <h4 className="fs-18 fw-bold text-white mb-0 lh-sm">{currentTitle}</h4>
+                                <nav aria-label="breadcrumb">
+                                    <ol className="breadcrumb mb-0 p-0 fs-12 text-white-50" style={{ gap: '4px' }}>
+                                        {currentBreadcrumbs.map((crumb, idx) => (
+                                            <li
+                                                key={idx}
+                                                className={`d-flex align-items-center ${
+                                                    idx === currentBreadcrumbs.length - 1
+                                                        ? 'active text-white fw-medium'
+                                                        : 'text-white text-opacity-75'
+                                                }`}
+                                            >
+                                                {idx > 0 && <span className="me-1 opacity-75">&rsaquo;</span>}
+                                                <span>{crumb}</span>
+                                            </li>
+                                        ))}
+                                    </ol>
+                                </nav>
                             </div>
-
                         </div>
                     </div>
 
@@ -100,122 +143,6 @@ export default function Topbar() {
                                     </div>
 
                                     <div className="position-relative rounded-0" style={{ maxHeight: '300px' }} data-simplebar>
-                                        {/* item*/}
-                                        {/* <div className="dropdown-item notification-item py-2 text-wrap active" id="notification-1">
-                                            <span className="d-flex align-items-center">
-                                                <span className="me-3 position-relative flex-shrink-0">
-                                                    <img src="/assets/images/users/avatar-2.jpg" className="avatar-lg rounded-circle"
-                                                        alt="" />
-                                                </span>
-                                                <span className="flex-grow-1 text-muted">
-                                                    <span className="fw-medium text-body">Glady Haid</span> commented on <span
-                                                        className="fw-medium text-body">Highdmin admin status</span>
-                                                    <br />
-                                                    <span className="fs-12">25m ago</span>
-                                                </span>
-                                                <span className="notification-item-close">
-                                                    <button type="button"
-                                                        className="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                                        data-dismissible="#notification-1">
-                                                        <i className="ri-close-line fs-16"></i>
-                                                    </button>
-                                                </span>
-                                            </span>
-                                        </div> */}
-
-                                        {/* item*/}
-                                        {/* <div className="dropdown-item notification-item py-2 text-wrap" id="notification-2">
-                                            <span className="d-flex align-items-center">
-                                                <span className="me-3 position-relative flex-shrink-0">
-                                                    <img src="/assets/images/users/avatar-4.jpg" className="avatar-lg rounded-circle"
-                                                        alt="" />
-                                                </span>
-                                                <span className="flex-grow-1 text-muted">
-                                                    <span className="fw-medium text-body">Tommy Berry</span> donated <span
-                                                        className="text-success">$100.00</span> for <span
-                                                            className="fw-medium text-body">Carbon removal program</span>
-                                                    <br />
-                                                    <span className="fs-12">58m ago</span>
-                                                </span>
-                                                <span className="notification-item-close">
-                                                    <button type="button"
-                                                        className="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                                        data-dismissible="#notification-2">
-                                                        <i className="ri-close-line fs-16"></i>
-                                                    </button>
-                                                </span>
-                                            </span>
-                                        </div> */}
-
-                                        {/* item*/}
-                                        {/* <div className="dropdown-item notification-item py-2 text-wrap" id="notification-3">
-                                            <span className="d-flex align-items-center">
-                                                <div className="avatar-lg flex-shrink-0 me-3">
-                                                    <span className="avatar-title bg-success-subtle text-success rounded-circle fs-22">
-                                                        <iconify-icon icon="solar:wallet-money-bold-duotone"></iconify-icon>
-                                                    </span>
-                                                </div>
-                                                <span className="flex-grow-1 text-muted">
-                                                    You withdraw a <span className="fw-medium text-body">$500</span> by <span
-                                                        className="fw-medium text-body">New York ATM</span>
-                                                    <br />
-                                                    <span className="fs-12">2h ago</span>
-                                                </span>
-                                                <span className="notification-item-close">
-                                                    <button type="button"
-                                                        className="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                                        data-dismissible="#notification-3">
-                                                        <i className="ri-close-line fs-16"></i>
-                                                    </button>
-                                                </span>
-                                            </span>
-                                        </div> */}
-
-                                        {/* item*/}
-                                        {/* <div className="dropdown-item notification-item py-2 text-wrap" id="notification-4">
-                                            <span className="d-flex align-items-center">
-                                                <span className="me-3 position-relative flex-shrink-0">
-                                                    <img src="/assets/images/users/avatar-7.jpg" className="avatar-lg rounded-circle"
-                                                        alt="" />
-                                                </span>
-                                                <span className="flex-grow-1 text-muted">
-                                                    <span className="fw-medium text-body">Richard Allen</span> followed you in <span
-                                                        className="fw-medium text-body">Facebook</span>
-                                                    <br />
-                                                    <span className="fs-12">3h ago</span>
-                                                </span>
-                                                <span className="notification-item-close">
-                                                    <button type="button"
-                                                        className="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                                        data-dismissible="#notification-4">
-                                                        <i className="ri-close-line fs-16"></i>
-                                                    </button>
-                                                </span>
-                                            </span>
-                                        </div> */}
-
-                                        {/* item*/}
-                                        {/* <div className="dropdown-item notification-item py-2 text-wrap" id="notification-5">
-                                            <span className="d-flex align-items-center">
-                                                <span className="me-3 position-relative flex-shrink-0">
-                                                    <img src="/assets/images/users/avatar-10.jpg" className="avatar-lg rounded-circle"
-                                                        alt="" />
-                                                </span>
-                                                <span className="flex-grow-1 text-muted">
-                                                    <span className="fw-medium text-body">Victor Collier</span> liked you recent photo
-                                                    in <span className="fw-medium text-body">Instagram</span>
-                                                    <br />
-                                                    <span className="fs-12">10h ago</span>
-                                                </span>
-                                                <span className="notification-item-close">
-                                                    <button type="button"
-                                                        className="btn btn-ghost-danger rounded-circle btn-sm btn-icon"
-                                                        data-dismissible="#notification-5">
-                                                        <i className="ri-close-line fs-16"></i>
-                                                    </button>
-                                                </span>
-                                            </span>
-                                        </div> */}
                                     </div>
 
                                     {/* All*/}
@@ -258,33 +185,7 @@ export default function Topbar() {
                                         <span className="align-middle">My Account</span>
                                     </a>
 
-                                    {/* item*/}
-                                    {/* <a href="javascript:void(0);" className="dropdown-item">
-                                        <i className="ri-wallet-3-line me-1 fs-16 align-middle"></i>
-                                        <span className="align-middle">Wallet : <span className="fw-semibold">$89.25k</span></span>
-                                    </a> */}
-
-                                    {/* item*/}
-                                    {/* <a href="javascript:void(0);" className="dropdown-item">
-                                        <i className="ri-settings-2-line me-1 fs-16 align-middle"></i>
-                                        <span className="align-middle">Settings</span>
-                                    </a> */}
-
-                                    {/* item*/}
-                                    {/* <a href="javascript:void(0);" className="dropdown-item">
-                                        <i className="ri-question-line me-1 fs-16 align-middle"></i>
-                                        <span className="align-middle">Support</span>
-                                    </a> */}
-
                                     <div className="dropdown-divider"></div>
-
-                                    {/* item*/}
-                                    {/* <a href="javascript:void(0);" className="dropdown-item">
-                                        <i className="ri-lock-line me-1 fs-16 align-middle"></i>
-                                        <span className="align-middle">Lock Screen</span>
-                                    </a> */}
-
-                                    {/* item*/}
 
                                     <Link
                                         method="post"
@@ -300,25 +201,6 @@ export default function Topbar() {
                         </div>
                     </div>
                 </div>
-                {/* Topbar End */}
-
-                {/* Search Modal  */}
-                {/* <div className="modal fade" id="searchModal" tabIndex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
-                    <div className="modal-dialog modal-lg">
-                        <div className="modal-content bg-transparent">
-                            <form>
-                                <div className="card mb-1">
-                                    <div className="px-3 py-2 d-flex flex-row align-items-center" id="top-search">
-                                        <i className="ri-search-line fs-22"></i>
-                                        <input type="search" className="form-control border-0" id="search-modal-input"
-                                            placeholder="Search for actions, people," />
-                                        <button type="submit" className="btn p-0" data-bs-dismiss="modal" aria-label="Close">[esc]</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div> */}
             </header>
         </>
     );

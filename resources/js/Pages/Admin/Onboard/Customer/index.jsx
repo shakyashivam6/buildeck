@@ -153,26 +153,14 @@ export default function Index({ states = [], customers = { data: [] } }) {
     };
 
     return (
-        <AdminLayout>
+        <AdminLayout
+            title="Customers Management"
+            breadcrumbs={['Admin', 'Customers', 'Onboard']}
+        >
             <Head title="Customer Management & Onboarding" />
 
-            {/* Page Header */}
-            <div className="row">
-                <div className="col-12">
-                    <div className="page-title-box d-flex align-items-center justify-content-between">
-                        <h4 className="page-title mb-0">Customers Management</h4>
-                        <div className="page-title-right">
-                            <ol className="breadcrumb m-0">
-                                <li className="breadcrumb-item"><a href="#!">Admin</a></li>
-                                <li className="breadcrumb-item"><a href="#!">Customers</a></li>
-                                <li className="breadcrumb-item active">Onboard</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Flash Messages */}
+            <div className="pt-3">
+                {/* Flash Messages */}
             {flash?.success && (
                 <div className="alert alert-success alert-dismissible fade show" role="alert">
                     <i className="ri-check-double-line me-2 fs-16"></i>
@@ -807,6 +795,7 @@ export default function Index({ states = [], customers = { data: [] } }) {
                     </div>
                 </div>
             )}
+            </div>
         </AdminLayout>
     );
 }
