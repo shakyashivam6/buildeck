@@ -66,13 +66,13 @@ export default function Sidebar() {
                 {/* Brand Logo */}
                 <Link href={route('dashboard')} className="logo">
                     <span className="logo-light">
-                        <span className="logo-lg"><img src="/assets/images/logo.png" alt="logo" /></span>
-                        <span className="logo-sm"><img src="/assets/images/logo-sm.png" alt="small logo" /></span>
+                        <span className="logo-lg"><img src="/assets/images/light-logo.png" alt="logo" /></span>
+                        <span className="logo-sm"><img src="/assets/images/light-logo.png" alt="small logo" /></span>
                     </span>
 
                     <span className="logo-dark">
-                        <span className="logo-lg"><img src="/assets/images/logo.png" style={{ height: '3rem' }} alt="dark logo" /></span>
-                        <span className="logo-sm"><img src="/assets/images/logo-sm.png" alt="small logo" /></span>
+                        <span className="logo-lg"><img src="/assets/images/dark-logo.png" style={{ height: '3rem' }} alt="dark logo" /></span>
+                        <span className="logo-sm"><img src="/assets/images/dark-logo.png" alt="small logo" /></span>
                     </span>
                 </Link>
 

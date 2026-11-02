@@ -1,7 +1,7 @@
 @charset "UTF-8";
 @import url(https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&amp;display=swap);
 :root {
-    --highdmin-logo-lg-height: 26px;
+    --highdmin-logo-lg-height: 50px;
     --highdmin-logo-sm-height: 28px;
     --highdmin-sidenav-width: 240px;
     --highdmin-sidenav-width-md: 160px;
