@@ -121,41 +121,41 @@ export default function Sidebar() {
                             </a>
                             <div className="dropdown-menu dropdown-menu-end">
                                 {/* item*/}
-                                <div className="dropdown-header noti-title">
+                                {/* <div className="dropdown-header noti-title">
                                     <h6 className="text-overflow m-0">Welcome !</h6>
-                                </div>
+                                </div> */}
 
                                 {/* item*/}
-                                <a href="javascript:void(0);" className="dropdown-item">
+                                {/* <a href="javascript:void(0);" className="dropdown-item">
                                     <i className="ri-account-circle-line me-1 fs-16 align-middle"></i>
                                     <span className="align-middle">My Account</span>
-                                </a>
+                                </a> */}
 
                                 {/* item*/}
-                                <a href="javascript:void(0);" className="dropdown-item">
+                                {/* <a href="javascript:void(0);" className="dropdown-item">
                                     <i className="ri-wallet-3-line me-1 fs-16 align-middle"></i>
                                     <span className="align-middle">Wallet : <span className="fw-semibold">$89.25k</span></span>
-                                </a>
+                                </a> */}
 
                                 {/* item*/}
-                                <a href="javascript:void(0);" className="dropdown-item">
+                                {/* <a href="javascript:void(0);" className="dropdown-item">
                                     <i className="ri-settings-2-line me-1 fs-16 align-middle"></i>
                                     <span className="align-middle">Settings</span>
-                                </a>
+                                </a> */}
 
                                 {/* item*/}
-                                <a href="javascript:void(0);" className="dropdown-item">
+                                {/* <a href="javascript:void(0);" className="dropdown-item">
                                     <i className="ri-question-line me-1 fs-16 align-middle"></i>
                                     <span className="align-middle">Support</span>
-                                </a>
+                                </a> */}
 
                                 <div className="dropdown-divider"></div>
 
                                 {/* item*/}
-                                <a href="javascript:void(0);" className="dropdown-item">
+                                {/* <a href="javascript:void(0);" className="dropdown-item">
                                     <i className="ri-lock-line me-1 fs-16 align-middle"></i>
                                     <span className="align-middle">Lock Screen</span>
-                                </a>
+                                </a> */}
 
                                 {/* item*/}
                                 <Link

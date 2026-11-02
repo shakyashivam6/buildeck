@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * Product Master Category
@@ -54,6 +55,14 @@ class Category extends Model
     public function subCategories(): HasMany
     {
         return $this->hasMany(SubCategory::class)->orderBy('display_order');
+    }
+
+    /**
+     * Products belonging to this category through subcategories.
+     */
+    public function products(): HasManyThrough
+    {
+        return $this->hasManyThrough(Product::class, SubCategory::class);
     }
 }
 

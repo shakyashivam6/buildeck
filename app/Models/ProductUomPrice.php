@@ -90,6 +90,14 @@ class ProductUomPrice extends Model
     }
 
     /**
+     * Alias for uom relationship.
+     */
+    public function unit(): BelongsTo
+    {
+        return $this->uom();
+    }
+
+    /**
      * Scope for units where loose sale is permitted.
      */
     public function scopeLooseAllowed(Builder $query): Builder

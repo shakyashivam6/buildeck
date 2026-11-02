@@ -1,822 +1,583 @@
+import React, { useEffect } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 
-export default function Dashboard({data}) {
+export default function Dashboard({ stats = {} }) {
+    useEffect(() => {
+        if (typeof window === "undefined" || !window.ApexCharts) {
+            return;
+        }
+
+        let catChartInstance = null;
+        let uomChartInstance = null;
+
+        const catLabels = stats?.category_chart?.labels || [];
+        const catSeries = stats?.category_chart?.series || [];
+
+        const catEl = document.querySelector("#category-distribution-chart");
+        if (catEl && catLabels.length > 0) {
+            catEl.innerHTML = "";
+            const catOptions = {
+                chart: {
+                    type: "bar",
+                    height: 300,
+                    toolbar: { show: false },
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 5,
+                        horizontal: true,
+                        barHeight: "55%",
+                        distributed: true,
+                    },
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: (val) => `${val} Products`,
+                    style: { fontSize: "11px", fontWeight: "bold" },
+                },
+                series: [
+                    {
+                        name: "Products Count",
+                        data: catSeries,
+                    },
+                ],
+                xaxis: {
+                    categories: catLabels,
+                    labels: { style: { fontSize: "12px" } },
+                },
+                yaxis: {
+                    labels: {
+                        maxWidth: 160,
+                        style: { fontSize: "12px", fontWeight: 500 },
+                    },
+                },
+                colors: ["#3e60d5", "#47ad77", "#39afd1", "#ffbc00", "#fa5c7c", "#6c757d", "#fd7e14"],
+                legend: { show: false },
+                grid: {
+                    borderColor: "#f1f3fa",
+                },
+            };
+            catChartInstance = new window.ApexCharts(catEl, catOptions);
+            catChartInstance.render();
+        }
+
+        const uomEl = document.querySelector("#uom-distribution-chart");
+        const uomTypes = stats?.uom_types || {};
+        const uomLabels = Object.keys(uomTypes).map((k) => (k.charAt(0).toUpperCase() + k.slice(1)).replace("_", " "));
+        const uomSeries = Object.values(uomTypes);
+
+        if (uomEl && uomLabels.length > 0) {
+            uomEl.innerHTML = "";
+            const uomOptions = {
+                chart: {
+                    type: "donut",
+                    height: 270,
+                },
+                series: uomSeries,
+                labels: uomLabels,
+                colors: ["#3e60d5", "#47ad77", "#39afd1", "#ffbc00", "#fa5c7c"],
+                legend: {
+                    position: "bottom",
+                    fontSize: "12px",
+                },
+                dataLabels: {
+                    enabled: true,
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: "65%",
+                        },
+                    },
+                },
+            };
+            uomChartInstance = new window.ApexCharts(uomEl, uomOptions);
+            uomChartInstance.render();
+        }
+
+        return () => {
+            if (catChartInstance) catChartInstance.destroy();
+            if (uomChartInstance) uomChartInstance.destroy();
+        };
+    }, [stats]);
+
     return (
         <AdminLayout
             title="Dashboard"
-            breadcrumbs={['Admin', 'Dashboard']}
+            breadcrumbs={["Admin", "Dashboard"]}
         >
-            {/* ============================================================== */}
-            {/* Start Page Content here */}
-            {/* ============================================================== */}
-
             <Head>
-                <title>{data?.title}</title>
+                <title>BuilDeck Admin Dashboard</title>
             </Head>
 
-            <div className="row row-cols-xxl-4 row-cols-md-2 row-cols-1">
+            {/* Top 4 KPI Metrics Row */}
+            <div className="row row-cols-xxl-4 row-cols-md-2 row-cols-1 g-3 mb-3">
+                {/* 1. Products */}
                 <div className="col">
-                    <div className="card">
+                    <div className="card h-100 shadow-sm border-0 border-start border-primary border-4">
                         <div className="card-body">
                             <div className="d-flex align-items-center gap-2 justify-content-between">
                                 <div>
-                                    <h5 className="text-muted fs-13 fw-bold text-uppercase" title="Number of Orders">
-                                        Total Orders</h5>
-                                    <h3 className="my-2 py-1 fw-bold">687.3k</h3>
-                                    <p className="mb-0 text-muted">
-                                        <span className="text-danger me-1"><i className="ri-arrow-left-down-box-line"></i>
-                                            9.19%</span>
-                                        <span className="text-nowrap">Since last month</span>
-                                    </p>
-                                </div>
-                                <div className="avatar-xl flex-shrink-0">
-                                    <span className="avatar-title bg-primary-subtle text-primary rounded-circle fs-42">
-                                        <iconify-icon icon="solar:bill-list-bold-duotone"></iconify-icon>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>{/* end col */}
-
-                <div className="col">
-                    <div className="card">
-                        <div className="card-body">
-                            <div className="d-flex align-items-center gap-2 justify-content-between">
-                                <div>
-                                    <h5 className="text-muted fs-13 fw-bold text-uppercase" title="Revenue">Total
-                                        Revenue</h5>
-                                    <h3 className="my-2 py-1 fw-bold">$5.42M</h3>
-                                    <p className="mb-0 text-muted">
-                                        <span className="text-success me-1"><i className="ri-arrow-left-up-box-line"></i>
-                                            4.67%</span>
-                                        <span className="text-nowrap">Since last month</span>
-                                    </p>
-                                </div>
-                                <div className="avatar-xl flex-shrink-0">
-                                    <span className="avatar-title bg-success-subtle text-success rounded-circle fs-42">
-                                        <iconify-icon icon="solar:wad-of-money-bold-duotone"></iconify-icon>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>{/* end col */}
-
-                <div className="col">
-                    <div className="card">
-                        <div className="card-body">
-                            <div className="d-flex align-items-center gap-2 justify-content-between">
-                                <div>
-                                    <h5 className="text-muted fs-13 fw-bold text-uppercase" title="New Users">New Users
+                                    <h5 className="text-muted fs-12 fw-bold text-uppercase mb-1">
+                                        Total Products
                                     </h5>
-                                    <h3 className="my-2 py-1 fw-bold">45.3k</h3>
-                                    <p className="mb-0 text-muted">
-                                        <span className="text-success me-1"><i className="ri-arrow-left-up-box-line"></i>
-                                            2.85%</span>
-                                        <span className="text-nowrap">Since last month</span>
+                                    <h3 className="my-1 py-0 fw-bold text-dark">
+                                        {stats?.total_products || 0}
+                                    </h3>
+                                    <p className="mb-0 fs-12 text-muted">
+                                        <span className="text-success fw-semibold me-1">
+                                            <i className="ri-checkbox-circle-fill"></i> {stats?.active_products || 0} Active
+                                        </span>
+                                        in Master Catalog
                                     </p>
                                 </div>
-                                <div className="avatar-xl flex-shrink-0">
-                                    <span className="avatar-title bg-warning-subtle text-warning rounded-circle fs-42">
-                                        <iconify-icon icon="solar:user-plus-bold-duotone"></iconify-icon>
+                                <div className="avatar-lg flex-shrink-0">
+                                    <span className="avatar-title bg-primary-subtle text-primary rounded-3 fs-32">
+                                        <i className="ri-box-3-line"></i>
                                     </span>
                                 </div>
                             </div>
+                            <div className="mt-3 pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                                <Link
+                                    href="/admin/catalog/products"
+                                    className="fs-12 fw-semibold text-primary text-decoration-none"
+                                >
+                                    Manage Products <i className="ri-arrow-right-line"></i>
+                                </Link>
+                                <span className="badge bg-primary-subtle text-primary fs-11">Multi-UOM</span>
+                            </div>
                         </div>
                     </div>
-                </div>{/* end col */}
+                </div>
 
+                {/* 2. Categories & Sub-Categories */}
                 <div className="col">
-                    <div className="card">
+                    <div className="card h-100 shadow-sm border-0 border-start border-success border-4">
                         <div className="card-body">
                             <div className="d-flex align-items-center gap-2 justify-content-between">
                                 <div>
-                                    <h5 className="text-muted fs-13 fw-bold text-uppercase"
-                                        title="Customer Satisfaction">Customer Satisfaction</h5>
-                                    <h3 className="my-2 py-1 fw-bold">94.6%</h3>
-                                    <p className="mb-0 text-muted">
-                                        <span className="text-success me-1"><i className="ri-arrow-left-up-box-line"></i>
-                                            1.32%</span>
-                                        <span className="text-nowrap">Since last month</span>
+                                    <h5 className="text-muted fs-12 fw-bold text-uppercase mb-1">
+                                        Categories & Subs
+                                    </h5>
+                                    <h3 className="my-1 py-0 fw-bold text-dark">
+                                        {stats?.total_categories || 0} <span className="fs-16 fw-normal text-muted">/ {stats?.total_sub_categories || 0}</span>
+                                    </h3>
+                                    <p className="mb-0 fs-12 text-muted">
+                                        <span className="text-success fw-semibold me-1">
+                                            <i className="ri-node-tree"></i> {stats?.total_sub_categories || 0} Sub-categories
+                                        </span>
+                                        configured
                                     </p>
                                 </div>
-                                <div className="avatar-xl flex-shrink-0">
-                                    <span className="avatar-title bg-info-subtle text-info rounded-circle fs-42">
-                                        <iconify-icon icon="solar:sticker-smile-circle-bold-duotone"></iconify-icon>
+                                <div className="avatar-lg flex-shrink-0">
+                                    <span className="avatar-title bg-success-subtle text-success rounded-3 fs-32">
+                                        <i className="ri-stack-line"></i>
                                     </span>
                                 </div>
                             </div>
+                            <div className="mt-3 pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                                <Link
+                                    href="/admin/catalog/categories"
+                                    className="fs-12 fw-semibold text-success text-decoration-none"
+                                >
+                                    Manage Categories <i className="ri-arrow-right-line"></i>
+                                </Link>
+                                <span className="badge bg-success-subtle text-success fs-11">Hierarchy</span>
+                            </div>
                         </div>
                     </div>
-                </div>{/* end col */}
-            </div>{/* end row */}
+                </div>
 
-            <div className="row">
-                <div className="col-xl-6">
-                    <div className="card">
-                        <div className="d-flex card-header justify-content-between align-items-center">
+                {/* 3. Vendors & Suppliers */}
+                <div className="col">
+                    <div className="card h-100 shadow-sm border-0 border-start border-warning border-4">
+                        <div className="card-body">
+                            <div className="d-flex align-items-center gap-2 justify-content-between">
+                                <div>
+                                    <h5 className="text-muted fs-12 fw-bold text-uppercase mb-1">
+                                        Registered Vendors
+                                    </h5>
+                                    <h3 className="my-1 py-0 fw-bold text-dark">
+                                        {stats?.total_vendors || 0}
+                                    </h3>
+                                    <p className="mb-0 fs-12 text-muted">
+                                        <span className="text-warning fw-semibold me-1">
+                                            <i className="ri-store-2-line"></i> Building Material
+                                        </span>
+                                        Dealers & Suppliers
+                                    </p>
+                                </div>
+                                <div className="avatar-lg flex-shrink-0">
+                                    <span className="avatar-title bg-warning-subtle text-warning rounded-3 fs-32">
+                                        <i className="ri-store-3-line"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="mt-3 pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                                <Link
+                                    href="/admin/onboard/vendor"
+                                    className="fs-12 fw-semibold text-warning text-decoration-none"
+                                >
+                                    Vendor Onboarding <i className="ri-arrow-right-line"></i>
+                                </Link>
+                                <span className="badge bg-warning-subtle text-warning fs-11">Suppliers</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* 4. Customers & Buyers */}
+                <div className="col">
+                    <div className="card h-100 shadow-sm border-0 border-start border-info border-4">
+                        <div className="card-body">
+                            <div className="d-flex align-items-center gap-2 justify-content-between">
+                                <div>
+                                    <h5 className="text-muted fs-12 fw-bold text-uppercase mb-1">
+                                        Registered Customers
+                                    </h5>
+                                    <h3 className="my-1 py-0 fw-bold text-dark">
+                                        {stats?.total_customers || 0}
+                                    </h3>
+                                    <p className="mb-0 fs-12 text-muted">
+                                        <span className="text-info fw-semibold me-1">
+                                            <i className="ri-team-line"></i> Builders & Buyers
+                                        </span>
+                                        on Platform
+                                    </p>
+                                </div>
+                                <div className="avatar-lg flex-shrink-0">
+                                    <span className="avatar-title bg-info-subtle text-info rounded-3 fs-32">
+                                        <i className="ri-user-star-line"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="mt-3 pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                                <Link
+                                    href="/admin/onboard/customer"
+                                    className="fs-12 fw-semibold text-info text-decoration-none"
+                                >
+                                    Customer Onboarding <i className="ri-arrow-right-line"></i>
+                                </Link>
+                                <span className="badge bg-info-subtle text-info fs-11">Clients</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Row 2: Charts & Catalog Analytics */}
+            <div className="row g-3 mb-3">
+                {/* Products by Category Bar Chart */}
+                <div className="col-xl-7">
+                    <div className="card h-100 shadow-sm border-0">
+                        <div className="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom border-light">
                             <div>
-                                <h4 className="header-title">Statistics</h4>
+                                <h4 className="header-title mb-0">Catalog Products Distribution</h4>
+                                <p className="text-muted fs-12 mb-0">Number of live products per major category</p>
                             </div>
-                            <div className="dropdown">
-                                <a href="#" className="dropdown-toggle drop-arrow-none card-drop"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i className="ri-more-2-fill fs-18"></i>
-                                </a>
-                                <div className="dropdown-menu dropdown-menu-end">
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">Sales Report</a>
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">Export Report</a>
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">Profit</a>
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">Action</a>
-                                </div>
-                            </div>
+                            <Link href="/admin/catalog/products" className="btn btn-sm btn-outline-primary">
+                                View Catalog <i className="ri-external-link-line ms-1"></i>
+                            </Link>
                         </div>
-
-                        <div className="card-body px-0 pt-0">
-                            <div className="bg-light bg-opacity-50">
-                                <div className="row text-center">
-                                    <div className="col-md-3 col-6">
-                                        <p className="text-muted mt-3 mb-1">Total Income</p>
-                                        <h4 className="mb-3">
-                                            <span className="ri-arrow-left-down-box-line text-success me-1"></span>
-                                            <span>$35.2k</span>
-                                        </h4>
-                                    </div>
-                                    <div className="col-md-3 col-6">
-                                        <p className="text-muted mt-3 mb-1">Total Expenditure</p>
-                                        <h4 className="mb-3">
-                                            <span className="ri-arrow-left-up-box-line text-danger me-1"></span>
-                                            <span>$18.9k</span>
-                                        </h4>
-                                    </div>
-                                    <div className="col-md-3 col-6">
-                                        <p className="text-muted mt-3 mb-1">Capital Invested</p>
-                                        <h4 className="mb-3">
-                                            <span className="ri-bar-chart-line me-1"></span>
-                                            <span>$5.2k</span>
-                                        </h4>
-                                    </div>
-                                    <div className="col-md-3 col-6">
-                                        <p className="text-muted mt-3 mb-1">Net Savings</p>
-                                        <h4 className="mb-3">
-                                            <span className="ri-bank-line me-1"></span>
-                                            <span>$8.1k</span>
-                                        </h4>
+                        <div className="card-body">
+                            {/* Summary pills */}
+                            <div className="row text-center mb-3 g-2">
+                                <div className="col-4">
+                                    <div className="p-2 bg-light rounded">
+                                        <span className="text-muted fs-11 d-block text-uppercase fw-semibold">UOM Units</span>
+                                        <h5 className="mb-0 fw-bold text-primary">{stats?.total_uoms || 0}</h5>
                                     </div>
                                 </div>
-
+                                <div className="col-4">
+                                    <div className="p-2 bg-light rounded">
+                                        <span className="text-muted fs-11 d-block text-uppercase fw-semibold">Pricing Tiers</span>
+                                        <h5 className="mb-0 fw-bold text-success">{stats?.total_pricing_tiers || 0}</h5>
+                                    </div>
+                                </div>
+                                <div className="col-4">
+                                    <div className="p-2 bg-light rounded">
+                                        <span className="text-muted fs-11 d-block text-uppercase fw-semibold">Loose-Sale Enabled</span>
+                                        <h5 className="mb-0 fw-bold text-warning">{stats?.loose_sale_products || 0}</h5>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div dir="ltr" className="px-1">
-                                <div id="statistics-chart" className="apex-charts" data-colors="#02c0ce,#777edd"></div>
+                            <div dir="ltr">
+                                <div id="category-distribution-chart" style={{ minHeight: "300px" }}></div>
                             </div>
-
                         </div>
-                    </div> {/* end card*/}
-                </div> {/* end col*/}
+                    </div>
+                </div>
 
-                <div className="col-xl-6">
-                    <div className="card">
-                        <div className="d-flex card-header justify-content-between align-items-center">
+                {/* Units of Measure (UOM) Breakdown Donut Chart */}
+                <div className="col-xl-5">
+                    <div className="card h-100 shadow-sm border-0">
+                        <div className="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom border-light">
                             <div>
-                                <h4 className="header-title">Total Revenue</h4>
+                                <h4 className="header-title mb-0">Units of Measure (UOM) Matrix</h4>
+                                <p className="text-muted fs-12 mb-0">{stats?.total_uoms || 0} total units grouped by measurement type</p>
                             </div>
-                            <div className="dropdown">
-                                <a href="#" className="dropdown-toggle drop-arrow-none card-drop"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i className="ri-more-2-fill fs-18"></i>
-                                </a>
-                                <div className="dropdown-menu dropdown-menu-end">
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">Sales Report</a>
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">Export Report</a>
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">Profit</a>
-                                    {/* item*/}
-                                    <a href="javascript:void(0);" className="dropdown-item">Action</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="card-body px-0 pt-0">
-                            <div className="border-top border-bottom border-light border-dashed">
-                                <div className="row text-center align-items-center">
-                                    <div className="col-md-3 col-6">
-                                        <p className="text-muted mt-3 mb-1">Revenue</p>
-                                        <h4 className="mb-3">
-                                            <span className="ri-arrow-left-down-box-line text-success me-1"></span>
-                                            <span>$29.5k</span>
-                                        </h4>
-                                    </div>
-                                    <div
-                                        className="col-md-3 col-6 bg-light bg-opacity-50 border-start border-light border-dashed">
-                                        <p className="text-muted mt-3 mb-1">Expenses</p>
-                                        <h4 className="mb-3">
-                                            <span className="ri-arrow-left-up-box-line text-danger me-1"></span>
-                                            <span>$15.07k</span>
-                                        </h4>
-                                    </div>
-                                    <div className="col-md-3 col-6 border-start border-end border-light border-dashed">
-                                        <p className="text-muted mt-3 mb-1">Investment</p>
-                                        <h4 className="mb-3">
-                                            <span className="ri-bar-chart-line me-1"></span>
-                                            <span>$3.6k</span>
-                                        </h4>
-                                    </div>
-                                    <div className="col-md-3 col-6">
-                                        <img src="/assets/images/cards/american-express.svg" alt="user-card"
-                                            height="36" />
-                                        <img src="/assets/images/cards/discover-card.svg" alt="user-card"
-                                            height="36" />
-                                        <img src="/assets/images/cards/mastercard.svg" alt="user-card" height="36" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div dir="ltr" className="px-2">
-                                <div id="revenue-chart" className="apex-charts" data-colors="#0acf97,#45bbe0"></div>
-                            </div>
-
-                        </div>
-                    </div> {/* end card*/}
-                </div> {/* end col*/}
-            </div> {/* end row*/}
-
-
-            <div className="row">
-                <div className="col-xxl-4">
-                    <div className="card">
-                        <div className="d-flex card-header justify-content-between align-items-center">
-                            <h4 className="header-title">Transactions</h4>
-                            <a href="javascript:void(0);" className="btn btn-sm btn-light">Add New <i
-                                className="ri-add-line ms-1"></i></a>
-                        </div>
-                        <div className="card-body p-0">
-                            <div className="bg-light bg-opacity-50 py-1 text-center">
-                                <p className="m-0"><b>69</b> Active brands out of <span className="fw-medium">102</span></p>
-                            </div>
-                            <div className="table-responsive">
-                                <table
-                                    className="table table-custom table-centered table-sm table-nowrap table-hover mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <span className="text-muted fs-12">Transaction ID</span> <br />
-                                                <h5 className="fs-14 mt-1">TXN001</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Date</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">2024-12-18</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Amount</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">$500.00</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Status</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal"><i
-                                                    className="ri-circle-fill fs-12 text-success"></i> Completed
-                                                </h5>
-                                            </td>
-                                            <td style={{ width: '30px' }}>
-                                                <div className="dropdown">
-                                                    <a href="#"
-                                                        className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i className="ri-more-2-fill"></i>
-                                                    </a>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        <a href="javascript:void(0);" className="dropdown-item">View
-                                                            Details</a>
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Refund</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <span className="text-muted fs-12">Transaction ID</span> <br />
-                                                <h5 className="fs-14 mt-1">TXN002</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Date</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">2024-12-17</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Amount</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">$1,200.00</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Status</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal"><i
-                                                    className="ri-circle-fill fs-12 text-danger"></i> Failed</h5>
-                                            </td>
-                                            <td style={{ width: '30px' }}>
-                                                <div className="dropdown">
-                                                    <a href="#"
-                                                        className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i className="ri-more-2-fill"></i>
-                                                    </a>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Retry</a>
-                                                        <a href="javascript:void(0);" className="dropdown-item">View
-                                                            Details</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <span className="text-muted fs-12">Transaction ID</span> <br />
-                                                <h5 className="fs-14 mt-1">TXN003</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Date</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">2024-12-16</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Amount</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">$300.00</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Status</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal"><i
-                                                    className="ri-circle-fill fs-12 text-warning"></i> Pending</h5>
-                                            </td>
-                                            <td style={{ width: '30px' }}>
-                                                <div className="dropdown">
-                                                    <a href="#"
-                                                        className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i className="ri-more-2-fill"></i>
-                                                    </a>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        <a href="javascript:void(0);" className="dropdown-item">View
-                                                            Details</a>
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Cancel</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <span className="text-muted fs-12">Transaction ID</span> <br />
-                                                <h5 className="fs-14 mt-1">TXN004</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Date</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">2024-12-15</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Amount</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">$2,500.00</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Status</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal"><i
-                                                    className="ri-circle-fill fs-12 text-success"></i> Completed
-                                                </h5>
-                                            </td>
-                                            <td style={{ width: '30px' }}>
-                                                <div className="dropdown">
-                                                    <a href="#"
-                                                        className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i className="ri-more-2-fill"></i>
-                                                    </a>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        <a href="javascript:void(0);" className="dropdown-item">View
-                                                            Details</a>
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Refund</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <span className="text-muted fs-12">Transaction ID</span> <br />
-                                                <h5 className="fs-14 mt-1">TXN005</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Date</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">2024-12-14</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Amount</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">$750.00</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Status</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal"><i
-                                                    className="ri-circle-fill fs-12 text-warning"></i> Pending</h5>
-                                            </td>
-                                            <td style={{ width: '30px' }}>
-                                                <div className="dropdown">
-                                                    <a href="#"
-                                                        className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i className="ri-more-2-fill"></i>
-                                                    </a>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        <a href="javascript:void(0);" className="dropdown-item">View
-                                                            Details</a>
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Cancel</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                            </div> {/* end table-responsive*/}
-                        </div> {/* end card-body*/}
-
-                        <div className="card-footer">
-                            <div className="align-items-center justify-content-between row text-center text-sm-start">
-                                <div className="col-sm">
-                                    <div className="text-muted">
-                                        Showing <span className="fw-semibold">5</span> of <span
-                                            className="fw-semibold">95.6k</span> Transactions
-                                    </div>
-                                </div>
-                                <div className="col-sm-auto mt-3 mt-sm-0">
-                                    <ul
-                                        className="pagination pagination-boxed pagination-sm mb-0 justify-content-center">
-                                        <li className="page-item disabled">
-                                            <a href="#" className="page-link"><i className="ri-arrow-left-s-line"></i></a>
-                                        </li>
-                                        <li className="page-item active">
-                                            <a href="#" className="page-link">1</a>
-                                        </li>
-                                        <li className="page-item">
-                                            <a href="#" className="page-link">2</a>
-                                        </li>
-                                        <li className="page-item">
-                                            <a href="#" className="page-link">3</a>
-                                        </li>
-                                        <li className="page-item">
-                                            <a href="#" className="page-link"><i className="ri-arrow-right-s-line"></i></a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div> {/* */}
-                        </div>
-
-                    </div> {/* end card*/}
-                </div> {/* end col*/}
-
-                <div className="col-xxl-4">
-                    <div className="card card-h-100">
-                        <div className="card-header d-flex flex-wrap align-items-center gap-2">
-                            <h4 className="header-title me-auto">Recent New Users</h4>
-
-                            <div className="d-flex gap-2 justify-content-end text-end">
-                                <a href="javascript:void(0);" className="btn btn-sm btn-light">Import <i
-                                    className="ri-download-line ms-1"></i></a>
-                                <a href="javascript:void(0);" className="btn btn-sm btn-primary">Export <i
-                                    className="ri-export-line ms-1"></i></a>
-                            </div>
-                        </div>
-
-                        <div className="card-body p-0">
-                            <div className="bg-light bg-opacity-50 py-1 text-center">
-                                <p className="m-0"><b>895k</b> Active users out of <span className="fw-medium">965k</span>
-                                </p>
-                            </div>
-
-                            <div className="table-responsive">
-                                <table
-                                    className="table table-custom table-centered table-sm table-nowrap table-hover mb-0">
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="avatar-md flex-shrink-0 me-2">
-                                                        <span className="avatar-title bg-primary-subtle rounded-circle">
-                                                            <img src="/assets/images/users/avatar-1.jpg" alt=""
-                                                                height="26" className="rounded-circle" />
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-muted fs-12">Name</span> <br />
-                                                        <h5 className="fs-14 mt-1">John Doe</h5>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Role</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">Administrator</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Status</span>
-                                                <h5 className="fs-14 mt-1 fw-normal"><i
-                                                    className="ri-circle-fill fs-12 text-success"></i> Active
-                                                </h5>
-                                            </td>
-                                            <td style={{ width: '30px' }}>
-                                                <div className="dropdown">
-                                                    <a href="#"
-                                                        className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i className="ri-more-2-fill"></i>
-                                                    </a>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        <a href="javascript:void(0);" className="dropdown-item">View
-                                                            Profile</a>
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Deactivate</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="avatar-md flex-shrink-0 me-2">
-                                                        <span className="avatar-title bg-info-subtle rounded-circle">
-                                                            <img src="/assets/images/users/avatar-2.jpg" alt=""
-                                                                height="26" className="rounded-circle" />
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-muted fs-12">Name</span> <br />
-                                                        <h5 className="fs-14 mt-1">Jane Smith</h5>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Role</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">Editor</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Status</span>
-                                                <h5 className="fs-14 mt-1 fw-normal"><i
-                                                    className="ri-circle-fill fs-12 text-warning"></i> Pending
-                                                </h5>
-                                            </td>
-                                            <td style={{ width: '30px' }}>
-                                                <div className="dropdown">
-                                                    <a href="#"
-                                                        className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i className="ri-more-2-fill"></i>
-                                                    </a>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        <a href="javascript:void(0);" className="dropdown-item">View
-                                                            Profile</a>
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Activate</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="avatar-md flex-shrink-0 me-2">
-                                                        <span
-                                                            className="avatar-title bg-secondary-subtle rounded-circle">
-                                                            <img src="/assets/images/users/avatar-3.jpg" alt=""
-                                                                height="26" className="rounded-circle" />
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-muted fs-12">Name</span> <br />
-                                                        <h5 className="fs-14 mt-1">Michael Brown</h5>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Role</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">Viewer</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Status</span>
-                                                <h5 className="fs-14 mt-1 fw-normal"><i
-                                                    className="ri-circle-fill fs-12 text-danger"></i> Inactive
-                                                </h5>
-                                            </td>
-                                            <td style={{ width: '30px' }}>
-                                                <div className="dropdown">
-                                                    <a href="#"
-                                                        className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i className="ri-more-2-fill"></i>
-                                                    </a>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Activate</a>
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Delete</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="avatar-md flex-shrink-0 me-2">
-                                                        <span className="avatar-title bg-warning-subtle rounded-circle">
-                                                            <img src="/assets/images/users/avatar-4.jpg" alt=""
-                                                                height="26" className="rounded-circle" />
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-muted fs-12">Name</span> <br />
-                                                        <h5 className="fs-14 mt-1">Emily Davis</h5>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Role</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">Manager</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Status</span>
-                                                <h5 className="fs-14 mt-1 fw-normal"><i
-                                                    className="ri-circle-fill fs-12 text-success"></i> Active
-                                                </h5>
-                                            </td>
-                                            <td style={{ width: '30px' }}>
-                                                <div className="dropdown">
-                                                    <a href="#"
-                                                        className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i className="ri-more-2-fill"></i>
-                                                    </a>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        <a href="javascript:void(0);" className="dropdown-item">View
-                                                            Profile</a>
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Deactivate</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="avatar-md flex-shrink-0 me-2">
-                                                        <span className="avatar-title bg-danger-subtle rounded-circle">
-                                                            <img src="/assets/images/users/avatar-5.jpg" alt=""
-                                                                height="26" className="rounded-circle" />
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <span className="text-muted fs-12">Name</span> <br />
-                                                        <h5 className="fs-14 mt-1">Robert Taylor</h5>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Role</span> <br />
-                                                <h5 className="fs-14 mt-1 fw-normal">Support</h5>
-                                            </td>
-                                            <td>
-                                                <span className="text-muted fs-12">Status</span>
-                                                <h5 className="fs-14 mt-1 fw-normal"><i
-                                                    className="ri-circle-fill fs-12 text-warning"></i> Pending
-                                                </h5>
-                                            </td>
-                                            <td style={{ width: '30px' }}>
-                                                <div className="dropdown">
-                                                    <a href="#"
-                                                        className="dropdown-toggle text-muted drop-arrow-none card-drop p-0"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                        <i className="ri-more-2-fill"></i>
-                                                    </a>
-                                                    <div className="dropdown-menu dropdown-menu-end">
-                                                        <a href="javascript:void(0);" className="dropdown-item">View
-                                                            Profile</a>
-                                                        <a href="javascript:void(0);"
-                                                            className="dropdown-item">Activate</a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                            </div> {/* end table-responsive*/}
-                        </div> {/* end card-body*/}
-
-                        <div className="card-footer">
-                            <div className="align-items-center justify-content-between row text-center text-sm-start">
-                                <div className="col-sm">
-                                    <div className="text-muted">
-                                        Showing <span className="fw-semibold">5</span> of <span
-                                            className="fw-semibold">2596</span> Users
-                                    </div>
-                                </div>
-                                <div className="col-sm-auto mt-3 mt-sm-0">
-                                    <ul
-                                        className="pagination pagination-boxed pagination-sm mb-0 justify-content-center">
-                                        <li className="page-item disabled">
-                                            <a href="#" className="page-link"><i className="ri-arrow-left-s-line"></i></a>
-                                        </li>
-                                        <li className="page-item active">
-                                            <a href="#" className="page-link">1</a>
-                                        </li>
-                                        <li className="page-item">
-                                            <a href="#" className="page-link">2</a>
-                                        </li>
-                                        <li className="page-item">
-                                            <a href="#" className="page-link"><i className="ri-arrow-right-s-line"></i></a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div> {/* */}
-                        </div>
-                    </div> {/* end card*/}
-                </div> {/* end col*/}
-
-                <div className="col-xxl-4">
-                    <div className="card">
-                        <div
-                            className="card-header d-flex flex-wrap align-items-center gap-2 border-bottom border-dashed">
-                            <h4 className="header-title me-auto">Transactions Uses</h4>
-
-                            <div className="d-flex gap-2 justify-content-end text-end">
-                                <a href="javascript:void(0);" className="btn btn-sm btn-primary">Refresh <i
-                                    className="ri-export-line ms-1"></i></a>
-                            </div>
+                            <Link href="/admin/catalog/uoms" className="btn btn-sm btn-outline-secondary">
+                                UOM Master <i className="ri-scales-3-line ms-1"></i>
+                            </Link>
                         </div>
                         <div className="card-body">
                             <div dir="ltr">
-                                <div id="data-visits-chart" className="apex-charts"
-                                    data-colors="#a3e0e7,#8fdae2,#79d4dd,#61cdd8,#42c7d3"></div>
+                                <div id="uom-distribution-chart" style={{ minHeight: "270px" }}></div>
+                            </div>
 
-                                <div className="row mt-2">
-                                    <div className="col">
-                                        <div className="d-flex justify-content-between align-items-center p-1">
-                                            <div>
-                                                <i className="ri-circle-fill fs-12 align-middle me-1 text-primary"></i>
-                                                <span className="align-middle fw-semibold">Direct</span>
-                                            </div>
-                                            <span className="fw-semibold text-muted float-end"><i
-                                                className="ri-arrow-down-double-line text-danger"></i> 965</span>
-                                        </div>
-
-                                        <div className="d-flex justify-content-between align-items-center p-1">
-                                            <div>
-                                                <i className="ri-circle-fill fs-12 text-success align-middle me-1"></i>
-                                                <span className="align-middle fw-semibold">Social</span>
-                                            </div>
-                                            <span className="fw-semibold text-muted float-end"><i
-                                                className="ri-arrow-up-double-line text-success"></i> 75</span>
-                                        </div>
-                                    </div>
-                                    <div className="col">
-                                        <div className="d-flex justify-content-between align-items-center p-1">
-                                            <div>
-                                                <i
-                                                    className="ri-circle-fill fs-12 text-secondary align-middle me-1"></i>
-                                                <span className="align-middle fw-semibold"> Marketing</span>
-                                            </div>
-                                            <span className="fw-semibold text-muted float-end"><i
-                                                className="ri-arrow-up-double-line text-success"></i> 102</span>
-                                        </div>
-
-                                        <div className="d-flex justify-content-between align-items-center p-1">
-                                            <div>
-                                                <i className="ri-circle-fill fs-12 text-danger align-middle me-1"></i>
-                                                <span className="align-middle fw-semibold">Affiliates</span>
-                                            </div>
-                                            <span className="fw-semibold text-muted float-end"><i
-                                                className="ri-arrow-down-double-line text-danger"></i> 96</span>
-                                        </div>
-                                    </div>
+                            {/* Top Brands Mini List */}
+                            <div className="mt-3 pt-3 border-top border-light">
+                                <div className="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 className="fs-13 fw-bold mb-0 text-dark">Top Brands in Master</h6>
+                                    <Link href="/admin/catalog/brands" className="fs-11 text-muted text-decoration-none">
+                                        {stats?.total_brands || 0} Brands Total &rarr;
+                                    </Link>
+                                </div>
+                                <div className="d-flex flex-wrap gap-1">
+                                    {(stats?.top_brands || []).map((b) => (
+                                        <span
+                                            key={b.id}
+                                            className="badge bg-light text-dark border px-2 py-1 fs-11 d-inline-flex align-items-center gap-1"
+                                        >
+                                            <i className="ri-award-line text-primary"></i>
+                                            {b.name}
+                                            {b.count > 0 && (
+                                                <span className="badge bg-primary-subtle text-primary ms-1">
+                                                    {b.count}
+                                                </span>
+                                            )}
+                                        </span>
+                                    ))}
                                 </div>
                             </div>
-                        </div> {/* end card-body*/}
-                    </div> {/* end card*/}
-                </div> {/* end col*/}
-            </div> {/* end row*/}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            {/* ============================================================== */}
-            {/* End Page content */}
-            {/* ============================================================== */}
+            {/* Row 3: Live Tables (Recent Products & Registered Accounts) */}
+            <div className="row g-3">
+                {/* Recent Products Master */}
+                <div className="col-xxl-7">
+                    <div className="card h-100 shadow-sm border-0">
+                        <div className="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom border-light">
+                            <div>
+                                <h4 className="header-title mb-0">Recent Products in Catalog</h4>
+                                <p className="text-muted fs-12 mb-0">Latest additions to the construction materials master</p>
+                            </div>
+                            <Link href="/admin/catalog/products" className="btn btn-sm btn-primary">
+                                <i className="ri-add-line me-1"></i> Add Product
+                            </Link>
+                        </div>
+                        <div className="card-body p-0">
+                            <div className="table-responsive">
+                                <table className="table table-hover table-nowrap align-middle mb-0">
+                                    <thead className="table-light fs-12 text-uppercase text-muted">
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Category / Sub-category</th>
+                                            <th>Brand</th>
+                                            <th>Base UOM & Price</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="fs-13">
+                                        {(stats?.recent_products || []).length === 0 ? (
+                                            <tr>
+                                                <td colSpan={5} className="text-center py-4 text-muted">
+                                                    No products found in catalog.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            (stats?.recent_products || []).map((prod) => (
+                                                <tr key={prod.id}>
+                                                    <td>
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            {prod.cover_image_url ? (
+                                                                <img
+                                                                    src={prod.cover_image_url}
+                                                                    alt={prod.name}
+                                                                    className="rounded border"
+                                                                    style={{ width: "36px", height: "36px", objectFit: "cover" }}
+                                                                />
+                                                            ) : (
+                                                                <div
+                                                                    className="rounded bg-light border d-flex align-items-center justify-content-center text-muted"
+                                                                    style={{ width: "36px", height: "36px" }}
+                                                                >
+                                                                    <i className="ri-image-line fs-18"></i>
+                                                                </div>
+                                                            )}
+                                                            <div style={{ maxWidth: "240px" }}>
+                                                                <span className="fw-semibold text-dark text-truncate d-block" title={prod.name}>
+                                                                    {prod.name}
+                                                                </span>
+                                                                <span className="badge bg-secondary-subtle text-secondary font-monospace fs-10">
+                                                                    {prod.sku || "NO-SKU"}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span className="fw-medium text-dark d-block">{prod.category}</span>
+                                                        <span className="text-muted fs-11">{prod.sub_category}</span>
+                                                    </td>
+                                                    <td>
+                                                        <span className="badge bg-info-subtle text-info border border-info-subtle">
+                                                            {prod.brand}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        {prod.base_price ? (
+                                                            <>
+                                                                <span className="fw-bold text-dark">
+                                                                    ₹{Number(prod.base_price).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                                                                </span>
+                                                                <span className="text-muted fs-11 d-block">
+                                                                    per {prod.base_uom_code}
+                                                                </span>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-muted fs-12">Not set</span>
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            className={`badge ${
+                                                                prod.is_active
+                                                                    ? "bg-success-subtle text-success"
+                                                                    : "bg-danger-subtle text-danger"
+                                                            }`}
+                                                        >
+                                                            {prod.is_active ? "Active" : "Inactive"}
+                                                        </span>
+                                                        {prod.allow_loose && (
+                                                            <span
+                                                                className="badge bg-warning-subtle text-warning ms-1"
+                                                                title="Loose Sale Allowed"
+                                                            >
+                                                                Loose
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div className="card-footer bg-transparent border-top border-light py-2 text-center">
+                            <Link href="/admin/catalog/products" className="fs-12 text-primary fw-semibold text-decoration-none">
+                                View All Products in Catalog &rarr;
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Recent Users / Accounts */}
+                <div className="col-xxl-5">
+                    <div className="card h-100 shadow-sm border-0">
+                        <div className="card-header bg-transparent d-flex justify-content-between align-items-center border-bottom border-light">
+                            <div>
+                                <h4 className="header-title mb-0">System Users & Accounts</h4>
+                                <p className="text-muted fs-12 mb-0">{stats?.total_users || 0} registered user accounts</p>
+                            </div>
+                            <div className="d-flex gap-1">
+                                <Link href={route('admin.onboard.vendor')} className="btn btn-sm btn-outline-warning">
+                                    Vendors
+                                </Link>
+                                <Link href={route('admin.onboard.customer')} className="btn btn-sm btn-outline-info">
+                                    Customers
+                                </Link>
+                            </div>
+                        </div>
+                        <div className="card-body p-0">
+                            <div className="table-responsive">
+                                <table className="table table-hover table-nowrap align-middle mb-0">
+                                    <thead className="table-light fs-12 text-uppercase text-muted">
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Role</th>
+                                            <th>Contact</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="fs-13">
+                                        {(stats?.recent_users || []).length === 0 ? (
+                                            <tr>
+                                                <td colSpan={4} className="text-center py-4 text-muted">
+                                                    No users registered yet.
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            (stats?.recent_users || []).map((user) => (
+                                                <tr key={user.id}>
+                                                    <td>
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            <div
+                                                                className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-12 flex-shrink-0"
+                                                                style={{ width: "32px", height: "32px" }}
+                                                            >
+                                                                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                                                            </div>
+                                                            <div>
+                                                                <span className="fw-semibold text-dark d-block">
+                                                                    {user.name}
+                                                                </span>
+                                                                <span className="text-muted fs-11">
+                                                                    Joined {user.created_at}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            className={`badge text-capitalize ${
+                                                                user.role === "admin"
+                                                                    ? "bg-danger-subtle text-danger"
+                                                                    : user.role === "vendor"
+                                                                    ? "bg-warning-subtle text-warning"
+                                                                    : "bg-info-subtle text-info"
+                                                            }`}
+                                                        >
+                                                            {user.role}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span className="d-block text-dark fs-12">{user.email || user.mobile || "—"}</span>
+                                                        {user.mobile && user.email && (
+                                                            <span className="text-muted fs-11">{user.mobile}</span>
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            className={`badge ${
+                                                                user.status === "active"
+                                                                    ? "bg-success-subtle text-success"
+                                                                    : "bg-secondary-subtle text-secondary"
+                                                            }`}
+                                                        >
+                                                            {user.status || "active"}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div className="card-footer bg-transparent border-top border-light py-2 text-center">
+                            <span className="fs-12 text-muted">
+                                Manage user accounts from Onboard & Settings panels
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </AdminLayout>
     );
 }
