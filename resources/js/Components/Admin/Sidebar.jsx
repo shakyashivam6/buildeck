@@ -9,10 +9,10 @@ export default function Sidebar() {
             title: 'Dashboard',
             icon: 'ri-dashboard-3-line',
             route: 'dashboard',
-            badge: {
-                text: '5',
-                className: 'badge bg-danger rounded-pill',
-            },
+            // badge: {
+            //     text: '5',
+            //     className: 'badge bg-danger rounded-pill',
+            // },
         },
         {
             title: 'Onboard Users',
@@ -23,6 +23,10 @@ export default function Sidebar() {
                 {
                     title: 'Vendor',
                     route: 'admin.onboard.vendor',
+                },
+                {
+                    title: 'Customer',
+                    route: 'admin.onboard.customer',
                 },
             ],
         },

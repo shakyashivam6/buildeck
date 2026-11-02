@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\Admin\Onboard\CustomerController;
+use App\Http\Controllers\Admin\Onboard\VendorController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\Support\SupportController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,6 +16,7 @@ use Inertia\Inertia;
 //         'phpVersion' => PHP_VERSION,
 //     ]);
 // });
+
 
 Route::get('/dashboard', [AdminController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -34,7 +36,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
     Route::post('vendors/{vendor}', [VendorController::class, 'update'])->name('vendor.update');
     Route::post('vendors/{vendor}/status', [VendorController::class, 'updateStatus'])->name('vendor.status');
     Route::post('vendors/{vendor}/generate-credentials', [VendorController::class, 'generateCredentials'])->name('vendor.credentials');
-    Route::get('cities/{stateId}', [VendorController::class, 'getCities'])->name('cities.by-state');
+    Route::get('cities/{stateId}', [SupportController::class, 'getCities'])->name('cities.by-state');
+    
+    Route::get('customer-onbaord', [CustomerController::class, 'index'])->name('onboard.customer');
+    Route::post('customers', [CustomerController::class, 'store'])->name('customer.store');
+    Route::post('customers/{customer}', [CustomerController::class, 'update'])->name('customer.update');
+    Route::post('customers/{customer}/status', [CustomerController::class, 'updateStatus'])->name('customer.status');
+    Route::post('customers/{customer}/generate-credentials', [CustomerController::class, 'generateCredentials'])->name('customer.credentials');
 });
 
 require __DIR__.'/auth.php';

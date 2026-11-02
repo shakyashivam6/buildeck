@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\Onboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Support\SupportController;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\VendorProfile;
@@ -17,21 +18,15 @@ use Inertia\Response;
 
 class VendorController extends Controller
 {
-    /**
-     * Display a listing of vendors and the onboarding form.
-     */
     public function index(): Response
     {
-        $states = Location::where('parent_id', 1)
-            ->where('status', '1')
-            ->orderBy('name', 'asc')
-            ->get(['id', 'name']);
+        $states = SupportController::getStatesList();
 
         $vendors = VendorProfile::with(['user', 'state', 'city'])
             ->latest()
             ->paginate(15);
 
-        return Inertia::render('Admin/Onboard/index', [
+        return Inertia::render('Admin/Onboard/Vendor/index', [
             'states' => $states,
             'vendors' => $vendors,
         ]);
@@ -216,16 +211,4 @@ class VendorController extends Controller
         ])->with('success', 'Vendor login credentials generated successfully!');
     }
 
-    /**
-     * Get cities list by state ID.
-     */
-    public function getCities(int $stateId): JsonResponse
-    {
-        $cities = Location::where('parent_id', $stateId)
-            ->where('status', '1')
-            ->orderBy('name', 'asc')
-            ->get(['id', 'name']);
-
-        return response()->json($cities);
-    }
 }
