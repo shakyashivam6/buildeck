@@ -139,7 +139,7 @@ export default function Index({ states = [], vendors = { data: [] } }) {
             return;
         }
 
-        router.patch(route('admin.vendor.status', vendor.id), {
+        router.post(route('admin.vendor.status', vendor.id), {
             status: newStatus,
         }, {
             preserveScroll: true,

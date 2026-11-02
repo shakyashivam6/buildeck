@@ -14,7 +14,7 @@ export default function DeleteUserForm({ className = '' }) {
     const {
         data,
         setData,
-        delete: destroy,
+        post: destroy,
         processing,
         reset,
         errors,

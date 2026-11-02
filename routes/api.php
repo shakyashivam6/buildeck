@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ApiSupportController;
 use App\Http\Controllers\Api\VendorAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;

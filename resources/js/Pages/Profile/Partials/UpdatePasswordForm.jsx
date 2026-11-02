@@ -14,7 +14,7 @@ export default function UpdatePasswordForm({ className = '' }) {
         data,
         setData,
         errors,
-        put,
+        post,
         reset,
         processing,
         recentlySuccessful,
@@ -27,7 +27,7 @@ export default function UpdatePasswordForm({ className = '' }) {
     const updatePassword = (e) => {
         e.preventDefault();
 
-        put(route('password.update'), {
+        post(route('password.update'), {
             preserveScroll: true,
             onSuccess: () => reset(),
             onError: (errors) => {

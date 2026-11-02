@@ -27,7 +27,7 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->patch('/profile', [
+            ->post('/profile', [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
             ]);
@@ -49,7 +49,7 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->patch('/profile', [
+            ->post('/profile', [
                 'name' => 'Test User',
                 'email' => $user->email,
             ]);
@@ -67,7 +67,7 @@ class ProfileTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->delete('/profile', [
+            ->post('/profile/destroy', [
                 'password' => 'password',
             ]);
 
@@ -86,7 +86,7 @@ class ProfileTest extends TestCase
         $response = $this
             ->actingAs($user)
             ->from('/profile')
-            ->delete('/profile', [
+            ->post('/profile/destroy', [
                 'password' => 'wrong-password',
             ]);
 
