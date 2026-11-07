@@ -39,7 +39,6 @@ jobs:
           C_VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
           C_SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
           C_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          C_github_token: ${{ github.token }}
         run: |
           env | grep '^C_' | while IFS= read -r line; do
             k=${line%%=*}; v=${line#*=}
