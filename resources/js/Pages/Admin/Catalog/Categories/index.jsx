@@ -170,7 +170,7 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                 {/* Left Column: Categories List */}
                 <div className="col-lg-4 col-md-5">
                     <div className="card shadow-sm border-0 h-100">
-                        <div className="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <div className="card-header bg-transparent d-flex justify-content-between align-items-center py-3 border-bottom">
                             <h5 className="card-title mb-0 fw-semibold">
                                 <i className="ri-folder-3-line me-2 text-primary"></i>
                                 Main Categories
@@ -207,12 +207,12 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                                         </div>
 
                                         <div className="d-flex align-items-center gap-2">
-                                            <span className={`badge rounded-pill ${isSelected ? 'bg-primary text-white' : 'bg-light text-dark'}`}>
+                                            <span className={`badge rounded-pill ${isSelected ? 'bg-primary text-white' : 'bg-body-secondary text-body'}`}>
                                                 {cat.sub_categories?.length || 0} sub
                                             </span>
                                             <button
                                                 type="button"
-                                                className="btn btn-sm btn-light p-1 px-2 border"
+                                                className="btn btn-sm btn-outline-secondary p-1 px-2"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     openEditCategoryModal(cat);
@@ -233,11 +233,11 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                 <div className="col-lg-8 col-md-7">
                     <div className="card shadow-sm border-0 h-100">
                         {/* Header with Category Controls */}
-                        <div className="card-header bg-white py-3">
+                        <div className="card-header bg-transparent py-3 border-bottom">
                             <div className="d-flex flex-wrap justify-content-between align-items-center gap-2">
                                 <div>
                                     <div className="d-flex align-items-center gap-2">
-                                        <h5 className="card-title mb-0 fw-semibold text-dark">
+                                        <h5 className="card-title mb-0 fw-semibold text-body">
                                             <i className="ri-node-tree me-1 text-primary"></i>
                                             {selectedCategory?.name}
                                         </h5>
@@ -255,7 +255,7 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                                         </button>
                                     </div>
                                     <small className="text-muted">
-                                        Code: <code className="text-dark bg-light px-1">{selectedCategory?.code}</code> | Sub-Categories: {selectedCategory?.sub_categories?.length || 0}
+                                        Code: <code className="text-body bg-body-secondary px-1">{selectedCategory?.code}</code> | Sub-Categories: {selectedCategory?.sub_categories?.length || 0}
                                     </small>
                                 </div>
 

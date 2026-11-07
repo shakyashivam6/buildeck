@@ -290,7 +290,7 @@ export default function ProductsIndex({
             {/* Navigation Tabs */}
             <div className="row mb-3">
                 <div className="col-12">
-                    <ul className="nav nav-pills bg-light p-1 rounded d-inline-flex">
+                    <ul className="nav nav-pills bg-body-secondary p-1 rounded d-inline-flex">
                         <li className="nav-item">
                             <button
                                 className={`nav-link ${activeTab === 'list' ? 'active' : ''}`}
@@ -319,11 +319,11 @@ export default function ProductsIndex({
             {/* TAB 1: PRODUCT LIST */}
             {activeTab === 'list' && (
                 <div className="card shadow-sm border-0">
-                    <div className="card-header bg-white py-3">
+                    <div className="card-header bg-transparent py-3 border-bottom">
                         <form onSubmit={handleFilterSubmit} className="row g-2 align-items-center">
                             <div className="col-md-4">
                                 <div className="input-group">
-                                    <span className="input-group-text bg-light"><i className="ri-search-line"></i></span>
+                                    <span className="input-group-text"><i className="ri-search-line"></i></span>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -472,7 +472,7 @@ export default function ProductsIndex({
             {/* TAB 2: CREATE / EDIT MULTI-UOM FORM */}
             {activeTab === 'form' && (
                 <div className="card shadow-sm border-0">
-                    <div className="card-header bg-white py-3">
+                    <div className="card-header bg-transparent py-3 border-bottom">
                         <h5 className="card-title mb-0 fw-semibold">
                             <i className="ri-shopping-basket-line me-2 text-primary"></i>
                             {editingProduct ? `Edit Product (${editingProduct.name})` : "Create New Product with Images & Multi-UOM Entry Matrix"}
@@ -481,7 +481,7 @@ export default function ProductsIndex({
                     <div className="card-body">
                         <form onSubmit={handleSubmit}>
                             {/* Section 1: Basic Information */}
-                            <h6 className="fw-bold text-dark border-bottom pb-2 mb-3">
+                            <h6 className="fw-bold text-body border-bottom pb-2 mb-3">
                                 1. General Product Details
                             </h6>
 
@@ -599,7 +599,7 @@ export default function ProductsIndex({
                             <div className="row g-3 mb-4">
                                 {/* Cover Image Upload */}
                                 <div className="col-md-5">
-                                    <div className="border rounded p-3 bg-light h-100">
+                                    <div className="border rounded p-3 bg-body-secondary h-100">
                                         <label className="form-label fw-semibold d-flex justify-content-between align-items-center">
                                             <span><i className="ri-image-line me-1 text-primary"></i> Main Cover Image</span>
                                             {coverPreview && (
@@ -614,7 +614,7 @@ export default function ProductsIndex({
                                         </label>
 
                                         {coverPreview ? (
-                                            <div className="position-relative text-center border rounded bg-white p-2 mb-2">
+                                            <div className="position-relative text-center border rounded bg-body-tertiary p-2 mb-2">
                                                 <img
                                                     src={coverPreview}
                                                     alt="Cover preview"
@@ -623,7 +623,7 @@ export default function ProductsIndex({
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="border border-dashed rounded p-4 text-center bg-white mb-2 text-muted">
+                                            <div className="border border-dashed rounded p-4 text-center bg-body-tertiary mb-2 text-muted">
                                                 <i className="ri-upload-cloud-2-line fs-32 text-primary d-block mb-1"></i>
                                                 <span className="fs-13">Upload product cover photo</span>
                                             </div>
@@ -642,7 +642,7 @@ export default function ProductsIndex({
 
                                 {/* Gallery Images Upload */}
                                 <div className="col-md-7">
-                                    <div className="border rounded p-3 bg-light h-100">
+                                    <div className="border rounded p-3 bg-body-secondary h-100">
                                         <label className="form-label fw-semibold">
                                             <i className="ri-gallery-line me-1 text-primary"></i> Product Gallery Photos (Multiple)
                                         </label>
@@ -653,7 +653,7 @@ export default function ProductsIndex({
                                             {existingGallery.map((item) => (
                                                 <div
                                                     key={item.path}
-                                                    className="position-relative border rounded bg-white p-1"
+                                                    className="position-relative border rounded bg-body-tertiary p-1"
                                                     style={{ width: '80px', height: '80px' }}
                                                 >
                                                     <img
@@ -677,7 +677,7 @@ export default function ProductsIndex({
                                             {galleryPreviews.map((preview, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className="position-relative border border-primary rounded bg-white p-1"
+                                                    className="position-relative border border-primary rounded bg-body-tertiary p-1"
                                                     style={{ width: '80px', height: '80px' }}
                                                 >
                                                     <img
@@ -698,7 +698,7 @@ export default function ProductsIndex({
                                             ))}
 
                                             {existingGallery.length === 0 && galleryPreviews.length === 0 && (
-                                                <div className="w-100 border border-dashed rounded p-3 text-center bg-white text-muted">
+                                                <div className="w-100 border border-dashed rounded p-3 text-center bg-body-tertiary text-muted">
                                                     <i className="ri-image-add-line fs-24 d-block text-muted mb-1"></i>
                                                     <span className="fs-12">No gallery images added yet</span>
                                                 </div>

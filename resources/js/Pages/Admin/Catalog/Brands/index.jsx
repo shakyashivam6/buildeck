@@ -69,7 +69,7 @@ export default function BrandsIndex({ brands = { data: [] }, subCategories = [] 
             <Head title="Brands Master - BuilDeck Admin" />
 
             <div className="card shadow-sm border-0">
-                <div className="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div className="card-header bg-transparent d-flex justify-content-between align-items-center py-3 border-bottom">
                     <div>
                         <h5 className="card-title mb-0 fw-semibold">
                             <i className="ri-award-line me-2 text-primary"></i>
@@ -105,9 +105,9 @@ export default function BrandsIndex({ brands = { data: [] }, subCategories = [] 
                                 ) : (
                                     brands.data.map((brand) => (
                                         <tr key={brand.id}>
-                                            <td className="fw-semibold text-dark">
+                                            <td className="fw-semibold text-body">
                                                 <div className="d-flex align-items-center gap-2">
-                                                    <div className="avatar-xs bg-light rounded d-flex align-items-center justify-content-center border fw-bold text-primary">
+                                                    <div className="avatar-xs bg-primary-subtle rounded d-flex align-items-center justify-content-center border fw-bold text-primary">
                                                         {brand.name.charAt(0)}
                                                     </div>
                                                     {brand.name}
@@ -123,7 +123,7 @@ export default function BrandsIndex({ brands = { data: [] }, subCategories = [] 
                                                 <div className="d-flex flex-wrap gap-1" style={{ maxWidth: '350px' }}>
                                                     {brand.sub_categories && brand.sub_categories.length > 0 ? (
                                                         brand.sub_categories.slice(0, 3).map((sub) => (
-                                                            <span key={sub.id} className="badge bg-light text-dark border fs-11">
+                                                            <span key={sub.id} className="badge bg-body-secondary text-body border fs-11">
                                                                 {sub.name}
                                                             </span>
                                                         ))
@@ -131,14 +131,14 @@ export default function BrandsIndex({ brands = { data: [] }, subCategories = [] 
                                                         <span className="text-muted fs-12">All Categories</span>
                                                     )}
                                                     {brand.sub_categories?.length > 3 && (
-                                                        <span className="badge bg-dark-subtle text-dark fs-11">
+                                                        <span className="badge bg-secondary-subtle text-body fs-11">
                                                             +{brand.sub_categories.length - 3} more
                                                         </span>
                                                     )}
                                                 </div>
                                             </td>
                                             <td>
-                                                <span className="badge rounded-pill bg-light text-dark border">
+                                                <span className="badge rounded-pill bg-body-secondary text-body border">
                                                     {brand.products_count || 0} products
                                                 </span>
                                             </td>
@@ -205,7 +205,7 @@ export default function BrandsIndex({ brands = { data: [] }, subCategories = [] 
                                                         className={`p-2 border rounded cursor-pointer d-flex align-items-center justify-content-between ${
                                                             data.sub_category_ids.includes(sub.id)
                                                                 ? 'border-primary bg-primary-subtle'
-                                                                : 'bg-white'
+                                                                : 'bg-body-secondary'
                                                         }`}
                                                         onClick={() => toggleSubCategory(sub.id)}
                                                     >

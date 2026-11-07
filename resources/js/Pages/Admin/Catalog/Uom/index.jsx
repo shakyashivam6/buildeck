@@ -71,7 +71,7 @@ export default function UomIndex({ uoms = { data: [] } }) {
             <Head title="Units of Measure - BuilDeck Admin" />
 
             <div className="card shadow-sm border-0">
-                <div className="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div className="card-header bg-transparent d-flex justify-content-between align-items-center py-3 border-bottom">
                     <div>
                         <h5 className="card-title mb-0 fw-semibold">
                             <i className="ri-ruler-line me-2 text-primary"></i>
@@ -108,8 +108,8 @@ export default function UomIndex({ uoms = { data: [] } }) {
                                 ) : (
                                     uoms.data.map((uom) => (
                                         <tr key={uom.id}>
-                                            <td className="fw-semibold text-dark">{uom.name}</td>
-                                            <td><code className="text-dark bg-light px-2 py-1 rounded">{uom.code}</code></td>
+                                            <td className="fw-semibold text-body">{uom.name}</td>
+                                            <td><code className="text-body bg-body-secondary px-2 py-1 rounded">{uom.code}</code></td>
                                             <td className="fw-bold">{uom.symbol}</td>
                                             <td>
                                                 <span className={`badge border text-capitalize ${getCategoryBadge(uom.unit_category)}`}>
@@ -117,12 +117,12 @@ export default function UomIndex({ uoms = { data: [] } }) {
                                                 </span>
                                             </td>
                                             <td>
-                                                <span className={`badge ${uom.is_discrete ? 'bg-dark text-white' : 'bg-light text-muted border'}`}>
+                                                <span className={`badge ${uom.is_discrete ? 'bg-dark text-white' : 'bg-body-secondary text-body border'}`}>
                                                     {uom.is_discrete ? 'Packaged / Discrete' : 'Continuous / Bulk'}
                                                 </span>
                                             </td>
                                             <td>
-                                                <span className="badge rounded-pill bg-light text-dark border">
+                                                <span className="badge rounded-pill bg-body-secondary text-body border">
                                                     {uom.product_prices_count || 0} pricing rows
                                                 </span>
                                             </td>
