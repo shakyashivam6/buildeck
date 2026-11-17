@@ -159,5 +159,21 @@ class Product extends Model
     {
         return $this->hasOne(ProductUomPrice::class)->where('is_default_selling_unit', true);
     }
+
+    /**
+     * Vendor inventory listings for this product.
+     */
+    public function vendorProducts(): HasMany
+    {
+        return $this->hasMany(VendorProduct::class, 'product_id');
+    }
+
+    /**
+     * Cart items referencing this product.
+     */
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class, 'product_id');
+    }
 }
 
