@@ -28,6 +28,9 @@ Plan ko modular aur step-by-step format me `docs/plans/` folder me organize kiya
    * Live vendor stock validation & dynamic price calculation.
    * `cart_items` table schema and API specifications.
 
+5. **[Flutter Developer Assistance Guide](file:///e:/GIT/buildeck/docs/FLUTTER_VENDOR_PRODUCTS_AND_CART_GUIDE.md)**:
+   * Ready-to-use Dart models, HTTP service code, headers, error handling, aur UI/UX modal guidelines.
+
 ---
 
 > [!TIP]

@@ -45,7 +45,7 @@ Schema::create('vendor_stock_ledgers', function (Blueprint $table) {
     $table->timestamps();
 
     // Index for fast reporting & history lookup
-    $table->index(['vendor_id', 'vendor_product_id', 'created_at']);
+    $table->index(['vendor_id', 'vendor_product_id', 'created_at'], 'vsl_vendor_product_created_idx');
 });
 ```
 

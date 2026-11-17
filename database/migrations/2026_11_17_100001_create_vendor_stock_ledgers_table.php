@@ -38,7 +38,7 @@ return new class extends Migration
             
             $table->timestamps();
 
-            $table->index(['vendor_id', 'vendor_product_id', 'created_at']);
+            $table->index(['vendor_id', 'vendor_product_id', 'created_at'], 'vsl_vendor_product_created_idx');
         });
     }
 
