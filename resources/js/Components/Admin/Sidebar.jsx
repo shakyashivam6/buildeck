@@ -48,6 +48,10 @@ export default function Sidebar() {
                     title: 'Products & Multi-UOM',
                     route: 'admin.catalog.products',
                 },
+                {
+                    title: 'Vendor Stock & Ledger',
+                    route: 'admin.catalog.vendor-stocks',
+                },
             ],
         },
     ];

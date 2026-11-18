@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             LocationsTableSeeder::class,
             ProductMasterSeeder::class,
+            DemoMarketplaceSeeder::class,
         ]);
     }
 }

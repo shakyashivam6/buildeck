@@ -1,6 +1,16 @@
 import AdminLayout from "@/Layouts/AdminLayout";
+import SearchableSelect from "@/Components/SearchableSelect";
 import { Head, useForm } from "@inertiajs/react";
 import { useState } from "react";
+
+const unitCategoryOptions = [
+    { id: 'mass', name: 'Mass / Weight (Kg, Tonne, Quintal)' },
+    { id: 'volume', name: 'Volume (Cft, Brass, Litre)' },
+    { id: 'area', name: 'Area (Sq. Ft., Sq. Meter)' },
+    { id: 'length', name: 'Length (Meter, Foot)' },
+    { id: 'discrete_pack', name: 'Discrete Packaging (Bag, Box, Coil, Bundle, Bucket)' },
+    { id: 'count', name: 'Count (Piece, Pair)' },
+];
 
 export default function UomIndex({ uoms = { data: [] } }) {
     const [editingUom, setEditingUom] = useState(null);
@@ -189,20 +199,17 @@ export default function UomIndex({ uoms = { data: [] } }) {
                                         />
                                     </div>
                                     <div className="mb-3">
-                                        <label className="form-label fw-semibold">Unit Category</label>
-                                        <select
-                                            className="form-select"
+                                        <label className="form-label fw-semibold">Unit Category <span className="text-danger">*</span></label>
+                                        <SearchableSelect
+                                            options={unitCategoryOptions}
                                             value={data.unit_category}
-                                            onChange={(e) => setData('unit_category', e.target.value)}
-                                            required
-                                        >
-                                            <option value="mass">Mass / Weight (Kg, Tonne, Quintal)</option>
-                                            <option value="volume">Volume (Cft, Brass, Litre)</option>
-                                            <option value="area">Area (Sq. Ft., Sq. Meter)</option>
-                                            <option value="length">Length (Meter, Foot)</option>
-                                            <option value="discrete_pack">Discrete Packaging (Bag, Box, Coil, Bundle, Bucket)</option>
-                                            <option value="count">Count (Piece, Pair)</option>
-                                        </select>
+                                            onChange={(val) => setData('unit_category', val)}
+                                            placeholder="Select Unit Category..."
+                                            error={errors.unit_category}
+                                        />
+                                        {errors.unit_category && (
+                                            <div className="text-danger fs-12 mt-1">{errors.unit_category}</div>
+                                        )}
                                     </div>
                                     <div className="form-check form-switch mb-3">
                                         <input

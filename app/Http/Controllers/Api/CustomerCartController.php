@@ -53,7 +53,7 @@ class CustomerCartController extends Controller
             return $this->errorResponse('vendor_id is required to fetch pricing options.', 422);
         }
 
-        $vendorProduct = VendorProduct::with(['vendor', 'product.baseUom', 'product.brand', 'product.uomPrices.uom'])
+        $vendorProduct = VendorProduct::with(['vendor', 'product.baseUom', 'product.brand', 'product.uomPrices.uom', 'uomPrices.uom'])
             ->where('vendor_id', $vendorId)
             ->where('product_id', $productId)
             ->where('is_available', true)
@@ -68,12 +68,16 @@ class CustomerCartController extends Controller
         $vendorStock = (float) $vendorProduct->stock;
 
         $options = [];
+        $uomTiers = $vendorProduct->uomPrices->isNotEmpty() ? $vendorProduct->uomPrices : $product->uomPrices;
 
-        // Traverse configured UOM prices from master product
-        foreach ($product->uomPrices as $uomPrice) {
+        // Traverse configured UOM prices (Vendor-specific if available, fallback to Master)
+        foreach ($uomTiers as $uomPrice) {
             $conversionFactor = (float) $uomPrice->conversion_factor;
-            // Unit selling price calculated relative to base conversion factor
-            $sellingPrice = round($vendorBasePrice * $conversionFactor, 2);
+            // Unit selling price: vendor direct price or derived from base price
+            $sellingPrice = isset($uomPrice->selling_price)
+                ? (float) $uomPrice->selling_price
+                : round($vendorBasePrice * $conversionFactor, 2);
+
             $mrp = $uomPrice->mrp ? round((float) $uomPrice->mrp, 2) : null;
 
             // 1. Complete Package Option (e.g. Bag, Box, Drum, etc.)
@@ -94,7 +98,7 @@ class CustomerCartController extends Controller
                 'max_available_qty' => $conversionFactor > 0 ? floor($vendorStock / $conversionFactor) : 0,
             ];
 
-            // 2. Loose Sale Option (If allowed for this UOM tier)
+            // 2. Loose Sale Option (If allowed for this vendor & UOM tier)
             if ($uomPrice->allow_loose_sale) {
                 // Per base unit loose rate (e.g., per Kg)
                 $looseRate = $conversionFactor > 0 ? round($sellingPrice / $conversionFactor, 2) : $sellingPrice;
@@ -145,7 +149,8 @@ class CustomerCartController extends Controller
         $quantity = (float) $request->input('quantity');
 
         // Check Vendor Product Inventory
-        $vendorProduct = VendorProduct::where('vendor_id', $vendorId)
+        $vendorProduct = VendorProduct::with('uomPrices')
+            ->where('vendor_id', $vendorId)
             ->where('product_id', $productId)
             ->where('is_available', true)
             ->first();
@@ -154,14 +159,28 @@ class CustomerCartController extends Controller
             return $this->errorResponse('This product is not currently available from the selected vendor.', 404);
         }
 
-        // Determine conversion factor and unit price
-        $uomPrice = ProductUomPrice::where('product_id', $productId)
+        $vendorUom = $vendorProduct->uomPrices->firstWhere('uom_id', $uomId);
+        $masterUom = ProductUomPrice::where('product_id', $productId)
             ->where('uom_id', $uomId)
             ->first();
 
-        $conversionFactor = $uomPrice ? (float) $uomPrice->conversion_factor : 1.0000;
+        // Validate loose sale permission
         if ($purchaseType === 'loose') {
-            $conversionFactor = 1.0000;
+            $isLooseAllowed = $vendorUom
+                ? (bool) $vendorUom->allow_loose_sale
+                : ($masterUom ? (bool) $masterUom->allow_loose_sale : false);
+
+            if (! $isLooseAllowed) {
+                return $this->errorResponse('This vendor does not allow loose sale for this item. Please select full package.', 422);
+            }
+        }
+
+        // Determine conversion factor and unit price
+        $conversionFactor = 1.0000;
+        if ($purchaseType !== 'loose') {
+            $conversionFactor = $vendorUom
+                ? (float) $vendorUom->conversion_factor
+                : ($masterUom ? (float) $masterUom->conversion_factor : 1.0000);
         }
 
         $baseQuantityNeeded = round($quantity * $conversionFactor, 2);
@@ -176,7 +195,16 @@ class CustomerCartController extends Controller
         }
 
         // Calculate unit price and total
-        $unitPrice = round((float) $vendorProduct->amount * $conversionFactor, 2);
+        if ($vendorUom && $purchaseType !== 'loose') {
+            $unitPrice = (float) $vendorUom->selling_price;
+        } elseif ($vendorUom && $purchaseType === 'loose') {
+            $unitPrice = (float) $vendorUom->conversion_factor > 0
+                ? round((float) $vendorUom->selling_price / (float) $vendorUom->conversion_factor, 2)
+                : (float) $vendorUom->selling_price;
+        } else {
+            $unitPrice = round((float) $vendorProduct->amount * $conversionFactor, 2);
+        }
+
         $totalPrice = round($unitPrice * $quantity, 2);
 
         // Store or update in cart_items

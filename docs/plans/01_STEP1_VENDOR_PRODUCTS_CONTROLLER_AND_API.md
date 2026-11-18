@@ -21,7 +21,7 @@ Schema::create('vendor_products', function (Blueprint $table) {
     $table->foreignId('vendor_id')->constrained('vendor_profiles')->cascadeOnDelete();
     $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
     $table->decimal('stock', 12, 2)->default(0.00);      // Live available stock in Base UOM
-    $table->decimal('amount', 12, 2);                    // Vendor's selling price
+    $table->decimal('amount', 12, 2);                    // Vendor's default selling price
     $table->decimal('mrp', 12, 2)->nullable();            // Optional MRP
     $table->decimal('min_order_qty', 10, 2)->default(1.00); // Vendor minimum order rule
     $table->boolean('is_available')->default(true);       // In-stock/Active toggle
@@ -29,6 +29,25 @@ Schema::create('vendor_products', function (Blueprint $table) {
     $table->softDeletes();
 
     $table->unique(['vendor_id', 'product_id']); // Unique composite key
+});
+
+// Multi-UOM & Loose vs Package Control Table
+Schema::create('vendor_product_uoms', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('vendor_product_id')->constrained('vendor_products')->cascadeOnDelete();
+    $table->foreignId('uom_id')->constrained('units_of_measure')->cascadeOnDelete();
+    $table->decimal('conversion_factor', 14, 4)->default(1.0000);
+    $table->decimal('selling_price', 12, 2);
+    $table->decimal('mrp', 12, 2)->nullable();
+    $table->boolean('allow_loose_sale')->default(false); // Vendor control: loose vs full pack
+    $table->decimal('min_order_qty', 10, 2)->default(1.00);
+    $table->decimal('step_qty', 10, 2)->default(1.00);
+    $table->decimal('pack_contain_qty', 10, 2)->nullable();
+    $table->boolean('is_default_selling_unit')->default(false);
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+
+    $table->unique(['vendor_product_id', 'uom_id']);
 });
 ```
 

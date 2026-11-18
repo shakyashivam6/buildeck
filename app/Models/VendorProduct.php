@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -84,5 +85,21 @@ class VendorProduct extends Model
     public function stockLedgers(): HasMany
     {
         return $this->hasMany(VendorStockLedger::class, 'vendor_product_id');
+    }
+
+    /**
+     * Vendor-specific selling UOMs and packaging/loose rules.
+     */
+    public function uomPrices(): HasMany
+    {
+        return $this->hasMany(VendorProductUom::class, 'vendor_product_id');
+    }
+
+    /**
+     * Default primary selling unit for this vendor product.
+     */
+    public function defaultUomPrice(): HasOne
+    {
+        return $this->hasOne(VendorProductUom::class, 'vendor_product_id')->where('is_default_selling_unit', true);
     }
 }

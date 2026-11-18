@@ -8,6 +8,7 @@ use App\Http\Requests\Api\Vendor\AddToInventoryRequest;
 use App\Http\Requests\Api\Vendor\UpdateVendorProductRequest;
 use App\Models\Product;
 use App\Models\VendorProduct;
+use App\Models\VendorProductUom;
 use App\Models\VendorProfile;
 use App\Models\VendorStockLedger;
 use App\Services\Inventory\VendorStockService;
@@ -170,6 +171,7 @@ class VendorProductManagementController extends Controller
             'product.baseUom',
             'product.defaultUomPrice.uom',
             'product.uomPrices.uom',
+            'uomPrices.uom',
         ])->where('vendor_id', $vendor->id);
 
         // Search by Product Name or SKU
@@ -217,6 +219,20 @@ class VendorProductManagementController extends Controller
                 'mrp' => (float) $vp->mrp,
                 'min_order_qty' => (float) $vp->min_order_qty,
                 'is_available' => (bool) $vp->is_available,
+                'uom_prices' => $vp->uomPrices->map(fn ($up) => [
+                    'id' => $up->id,
+                    'uom_id' => $up->uom_id,
+                    'uom_name' => $up->uom?->name,
+                    'uom_symbol' => $up->uom?->symbol,
+                    'conversion_factor' => (float) $up->conversion_factor,
+                    'selling_price' => (float) $up->selling_price,
+                    'mrp' => $up->mrp ? (float) $up->mrp : null,
+                    'allow_loose_sale' => (bool) $up->allow_loose_sale,
+                    'min_order_qty' => (float) $up->min_order_qty,
+                    'step_qty' => (float) $up->step_qty,
+                    'pack_contain_qty' => $up->pack_contain_qty ? (float) $up->pack_contain_qty : null,
+                    'is_default_selling_unit' => (bool) $up->is_default_selling_unit,
+                ]),
                 'updated_at' => $vp->updated_at?->toIso8601String(),
             ];
         });
@@ -277,6 +293,47 @@ class VendorProductManagementController extends Controller
             ]);
         }
 
+        // Save Vendor UOM Prices if passed, or create default
+        $pricingMatrix = $request->input('pricing_matrix', $request->input('uom_prices', []));
+        if (! empty($pricingMatrix) && is_array($pricingMatrix)) {
+            $vendorProduct->uomPrices()->delete();
+            foreach ($pricingMatrix as $pRow) {
+                VendorProductUom::create([
+                    'vendor_product_id' => $vendorProduct->id,
+                    'uom_id' => $pRow['uom_id'],
+                    'conversion_factor' => $pRow['conversion_factor'] ?? 1.0000,
+                    'selling_price' => $pRow['selling_price'],
+                    'mrp' => ! empty($pRow['mrp']) ? $pRow['mrp'] : null,
+                    'allow_loose_sale' => ! empty($pRow['allow_loose_sale']),
+                    'min_order_qty' => $pRow['min_order_qty'] ?? 1.00,
+                    'step_qty' => $pRow['step_qty'] ?? 1.00,
+                    'pack_contain_qty' => ! empty($pRow['pack_contain_qty']) ? $pRow['pack_contain_qty'] : null,
+                    'is_default_selling_unit' => ! empty($pRow['is_default_selling_unit']),
+                    'is_active' => true,
+                ]);
+            }
+        } else {
+            $product = Product::find($productId);
+            if ($product) {
+                VendorProductUom::updateOrCreate(
+                    [
+                        'vendor_product_id' => $vendorProduct->id,
+                        'uom_id' => $product->base_uom_id,
+                    ],
+                    [
+                        'conversion_factor' => 1.0000,
+                        'selling_price' => $amount,
+                        'mrp' => $mrp,
+                        'allow_loose_sale' => true,
+                        'min_order_qty' => $minOrderQty,
+                        'step_qty' => 1.00,
+                        'is_default_selling_unit' => true,
+                        'is_active' => true,
+                    ]
+                );
+            }
+        }
+
         // Record Initial Opening Stock Ledger Entry
         if ($stock > 0) {
             VendorStockService::initializeOpeningStock(
@@ -325,6 +382,37 @@ class VendorProductManagementController extends Controller
         if ($request->filled('min_order_qty')) {
             $vendorProduct->min_order_qty = (float) $request->input('min_order_qty');
         }
+
+        // Sync Vendor UOM Pricing Matrix if provided
+        $pricingMatrix = $request->input('pricing_matrix', $request->input('uom_prices'));
+        if (! empty($pricingMatrix) && is_array($pricingMatrix)) {
+            $defaultRow = collect($pricingMatrix)->firstWhere('is_default_selling_unit', true) ?? $pricingMatrix[0];
+            $vendorProduct->amount = (float) $defaultRow['selling_price'];
+            if (! empty($defaultRow['mrp'])) {
+                $vendorProduct->mrp = (float) $defaultRow['mrp'];
+            }
+            if (! empty($defaultRow['min_order_qty'])) {
+                $vendorProduct->min_order_qty = (float) $defaultRow['min_order_qty'];
+            }
+
+            $vendorProduct->uomPrices()->delete();
+            foreach ($pricingMatrix as $pRow) {
+                VendorProductUom::create([
+                    'vendor_product_id' => $vendorProduct->id,
+                    'uom_id' => $pRow['uom_id'],
+                    'conversion_factor' => $pRow['conversion_factor'] ?? 1.0000,
+                    'selling_price' => $pRow['selling_price'],
+                    'mrp' => ! empty($pRow['mrp']) ? $pRow['mrp'] : null,
+                    'allow_loose_sale' => ! empty($pRow['allow_loose_sale']),
+                    'min_order_qty' => $pRow['min_order_qty'] ?? 1.00,
+                    'step_qty' => $pRow['step_qty'] ?? 1.00,
+                    'pack_contain_qty' => ! empty($pRow['pack_contain_qty']) ? $pRow['pack_contain_qty'] : null,
+                    'is_default_selling_unit' => ! empty($pRow['is_default_selling_unit']),
+                    'is_active' => true,
+                ]);
+            }
+        }
+
         $vendorProduct->save();
 
         // If target stock is explicitly provided and different from current stock, perform audit adjustment

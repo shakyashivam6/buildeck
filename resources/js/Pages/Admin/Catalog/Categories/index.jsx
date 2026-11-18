@@ -457,16 +457,16 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                                 <div className="modal-body">
                                     <div className="mb-3">
                                         <label className="form-label fw-semibold">Parent Category <span className="text-danger">*</span></label>
-                                        <select
-                                            className="form-select"
+                                        <SearchableSelect
+                                            options={categories}
                                             value={subCategoryForm.data.category_id}
-                                            onChange={(e) => subCategoryForm.setData('category_id', e.target.value)}
-                                            required
-                                        >
-                                            {categories.map(c => (
-                                                <option key={c.id} value={c.id}>{c.name}</option>
-                                            ))}
-                                        </select>
+                                            onChange={(val) => subCategoryForm.setData('category_id', val)}
+                                            placeholder="Select Parent Category..."
+                                            error={subCategoryForm.errors.category_id}
+                                        />
+                                        {subCategoryForm.errors.category_id && (
+                                            <div className="text-danger fs-12 mt-1">{subCategoryForm.errors.category_id}</div>
+                                        )}
                                     </div>
                                     <div className="mb-3">
                                         <label className="form-label fw-semibold">Sub-Category Name <span className="text-danger">*</span></label>

@@ -10,6 +10,8 @@ export default function SearchableSelect({
     id = '',
     nameKey = 'name',
     valueKey = 'id',
+    size = '',
+    className = '',
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
@@ -58,7 +60,7 @@ export default function SearchableSelect({
 
     return (
         <div
-            className={`searchable-select position-relative ${disabled ? 'opacity-50' : ''}`}
+            className={`searchable-select position-relative ${disabled ? 'opacity-50' : ''} ${className}`}
             ref={dropdownRef}
         >
             {/* Display Box: Inherits theme background and text from Bootstrap .form-control */}
@@ -69,20 +71,20 @@ export default function SearchableSelect({
                 onClick={() => {
                     if (!disabled) setIsOpen(!isOpen);
                 }}
-                className={`form-control d-flex justify-content-between align-items-center ${
+                className={`form-control ${size === 'sm' ? 'form-control-sm' : ''} d-flex justify-content-between align-items-center ${
                     error ? 'is-invalid border-danger' : ''
                 } ${isOpen ? 'border-primary' : ''}`}
                 style={{
                     cursor: disabled ? 'not-allowed' : 'pointer',
                     userSelect: 'none',
-                    minHeight: '38px',
+                    minHeight: size === 'sm' ? '31px' : '38px',
                 }}
             >
-                <span className={selectedItem ? 'text-body' : 'text-muted'}>
+                <span className={`text-truncate ${selectedItem ? 'text-body' : 'text-muted'}`}>
                     {selectedItem ? selectedItem[nameKey] : placeholder}
                 </span>
                 <i
-                    className={`ri-arrow-${isOpen ? 'up' : 'down'}-s-line text-muted fs-16 ms-2`}
+                    className={`ri-arrow-${isOpen ? 'up' : 'down'}-s-line text-muted fs-16 ms-2 flex-shrink-0`}
                 ></i>
             </div>
 
@@ -125,12 +127,12 @@ export default function SearchableSelect({
                         }}
                     >
                         {filteredOptions.length > 0 ? (
-                            filteredOptions.map((opt) => {
+                            filteredOptions.map((opt, idx) => {
                                 const isSelected =
                                     String(opt[valueKey]) === String(value);
                                 return (
                                     <button
-                                        key={opt[valueKey]}
+                                        key={opt[valueKey] !== undefined && opt[valueKey] !== '' ? opt[valueKey] : `opt-${idx}`}
                                         type="button"
                                         onClick={() => handleSelect(opt)}
                                         className={`dropdown-item py-2 px-3 d-flex justify-content-between align-items-center ${
@@ -138,9 +140,9 @@ export default function SearchableSelect({
                                         }`}
                                         style={{ fontSize: '13.5px' }}
                                     >
-                                        <span>{opt[nameKey]}</span>
+                                        <span className="text-truncate">{opt[nameKey]}</span>
                                         {isSelected && (
-                                            <i className="ri-check-line ms-2"></i>
+                                            <i className="ri-check-line ms-2 flex-shrink-0"></i>
                                         )}
                                     </button>
                                 );

@@ -1,6 +1,6 @@
-# Flutter Integration Guide: Vendor Products, Stock Ledger & Customer Cart
+# Flutter Integration Guide: Vendor Products, Multi-UOM & Customer Cart
 
-Yeh document Flutter developers ke liye banaya gaya hai taaki naye **Vendor Product & Inventory Management**, **Stock Ledger Passbook**, aur **Customer Multi-UOM Add-to-Cart Modal** APIs ko Flutter application me bina kisi confusion ke implement kiya ja sake.
+Yeh document Flutter developers ke liye complete guide hai taaki naye **Vendor Product & Multi-UOM Packaging System**, **Loose vs Full Pack Control**, **Stock Ledger Passbook**, aur **Customer Multi-UOM Cart Modal** APIs ko Flutter application me seamlessly integrate kiya ja sake.
 
 ---
 
@@ -92,9 +92,76 @@ class ApiResponse<T> {
 }
 ```
 
-### B. Vendor Product Model
+### B. Vendor UOM Pricing & Packaging Rule Model
+```dart
+// lib/models/vendor_uom_price.dart
+class VendorUomPrice {
+  final int? id;
+  final int uomId;
+  final String? uomName;
+  final String? uomSymbol;
+  final double conversionFactor;
+  final double sellingPrice;
+  final double? mrp;
+  final bool allowLooseSale; // true = Loose allowed, false = Full Pack only
+  final double minOrderQty;
+  final double stepQty;
+  final double? packContainQty;
+  final bool isDefaultSellingUnit;
+
+  VendorUomPrice({
+    this.id,
+    required this.uomId,
+    this.uomName,
+    this.uomSymbol,
+    required this.conversionFactor,
+    required this.sellingPrice,
+    this.mrp,
+    this.allowLooseSale = false,
+    this.minOrderQty = 1.0,
+    this.stepQty = 1.0,
+    this.packContainQty,
+    this.isDefaultSellingUnit = false,
+  });
+
+  factory VendorUomPrice.fromJson(Map<String, dynamic> json) {
+    return VendorUomPrice(
+      id: json['id'],
+      uomId: json['uom_id'] ?? 0,
+      uomName: json['uom_name'] ?? json['uom']?['name'],
+      uomSymbol: json['uom_symbol'] ?? json['uom']?['symbol'],
+      conversionFactor: (json['conversion_factor'] as num?)?.toDouble() ?? 1.0,
+      sellingPrice: (json['selling_price'] as num?)?.toDouble() ?? 0.0,
+      mrp: (json['mrp'] as num?)?.toDouble(),
+      allowLooseSale: json['allow_loose_sale'] == true || json['allow_loose_sale'] == 1,
+      minOrderQty: (json['min_order_qty'] as num?)?.toDouble() ?? 1.0,
+      stepQty: (json['step_qty'] as num?)?.toDouble() ?? 1.0,
+      packContainQty: (json['pack_contain_qty'] as num?)?.toDouble(),
+      isDefaultSellingUnit: json['is_default_selling_unit'] == true || json['is_default_selling_unit'] == 1,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'uom_id': uomId,
+      'conversion_factor': conversionFactor,
+      'selling_price': sellingPrice,
+      if (mrp != null) 'mrp': mrp,
+      'allow_loose_sale': allowLooseSale,
+      'min_order_qty': minOrderQty,
+      'step_qty': stepQty,
+      if (packContainQty != null) 'pack_contain_qty': packContainQty,
+      'is_default_selling_unit': isDefaultSellingUnit,
+    };
+  }
+}
+```
+
+### C. Vendor Product Inventory Item Model
 ```dart
 // lib/models/vendor_product_item.dart
+import 'vendor_uom_price.dart';
+
 class VendorProductItem {
   final int vendorProductId;
   final int productId;
@@ -111,6 +178,7 @@ class VendorProductItem {
   final double? mrp;
   final double minOrderQty;
   final bool isAvailable;
+  final List<VendorUomPrice> uomPrices;
 
   VendorProductItem({
     required this.vendorProductId,
@@ -128,9 +196,11 @@ class VendorProductItem {
     this.mrp,
     required this.minOrderQty,
     required this.isAvailable,
+    this.uomPrices = const [],
   });
 
   factory VendorProductItem.fromJson(Map<String, dynamic> json) {
+    final uomList = (json['uom_prices'] as List?) ?? [];
     return VendorProductItem(
       vendorProductId: json['vendor_product_id'] ?? 0,
       productId: json['product_id'] ?? 0,
@@ -147,12 +217,13 @@ class VendorProductItem {
       mrp: (json['mrp'] as num?)?.toDouble(),
       minOrderQty: (json['min_order_qty'] as num?)?.toDouble() ?? 1.0,
       isAvailable: json['is_available'] ?? true,
+      uomPrices: uomList.map((e) => VendorUomPrice.fromJson(e)).toList(),
     );
   }
 }
 ```
 
-### C. Stock Ledger Passbook Model
+### D. Stock Ledger Passbook Model
 ```dart
 // lib/models/stock_ledger_item.dart
 class StockLedgerItem {
@@ -199,7 +270,7 @@ class StockLedgerItem {
 }
 ```
 
-### D. Customer Multi-UOM Pricing Modal Models
+### E. Customer Multi-UOM Pricing Modal Models
 ```dart
 // lib/models/pricing_modal_data.dart
 class PricingOption {
@@ -297,92 +368,141 @@ class PricingModalData {
 ### 🏢 Vendor Module (Protected: `auth:sanctum`)
 | Feature | Method | Endpoint | Description |
 | :--- | :--- | :--- | :--- |
-| **Master Catalog** | `GET` | `/vendor/products/catalog` | Admin ke added master products browse/search karna |
-| **My Inventory** | `GET` | `/vendor/products/my-inventory` | Vendor ke apne active products, stock aur amount |
-| **Add to Inventory** | `POST` | `/vendor/products/add-to-inventory` | Master product ko stock & price ke sath add karna |
-| **Update Stock & Price** | `PUT` | `/vendor/products/{id}/update` | Price change aur physical audit stock adjust karna |
-| **Quick Stock Arrival** | `POST` | `/vendor/products/{id}/add-stock` | New shipment/inward stock direct add karna |
+| **Master Catalog** | `GET` | `/vendor/products/catalog` | Master products browse karna (Includes recommended `uom_prices`) |
+| **My Inventory** | `GET` | `/vendor/products/my-inventory` | Active inventory, current stock aur vendor ke `uom_prices` |
+| **Add to Inventory** | `POST` | `/vendor/products/add-to-inventory` | Add product with Multi-UOM, prices & Loose vs Pack rules |
+| **Update Stock & Price** | `PUT` | `/vendor/products/{id}/update` | Update prices, loose toggles, ya physical count audit |
+| **Quick Stock Arrival** | `POST` | `/vendor/products/{id}/add-stock` | Inward shipment/stock arrival direct add karna |
 | **Toggle Availability** | `PATCH` | `/vendor/products/{id}/toggle-status` | Product ko In-Stock / Out-of-Stock mark karna |
 | **Stock Ledger Passbook**| `GET` | `/vendor/products/{id}/stock-ledger` | Har credit/debit transaction ka audit trail |
 
 ### 🛒 Customer Module
 | Feature | Method | Endpoint | Auth | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| **Pricing Modal Config** | `GET` | `/customer/products/{id}/pricing-modal?vendor_id={vId}` | Public | Modal open hone par Full Pack vs Loose options |
-| **Add to Cart** | `POST` | `/customer/cart/add` | Yes | Live vendor stock validation ke sath cart add |
-| **Get Cart** | `GET` | `/customer/cart` | Yes | Active cart items aur total amount dekhna |
-| **Delete from Cart** | `DELETE` | `/customer/cart/{id}` | Yes | Cart se item remove karna |
+| **Pricing Modal Config** | `GET` | `/customer/products/{id}/pricing-modal?vendor_id={vId}` | Public | Vendor ke loose vs package options fetch karna |
+| **Add to Cart** | `POST` | `/customer/cart/add` | Yes | Live vendor stock & loose rule validation |
+| **Get Cart** | `GET` | `/customer/cart` | Yes | Active cart items dekhna |
+| **Delete from Cart** | `DELETE` | `/customer/cart/{id}` | Yes | Cart item remove karna |
 
 ---
 
 ## 5. Vendor API Integration Details (Code Examples)
 
 ### A. Browse Master Catalog (`GET /vendor/products/catalog`)
-Vendor ko Admin ke master products dikhata hai. Response me `is_already_added: true/false` flag aayega taaki UI me "Already in Inventory" badge dikha sakein.
+Vendor ko Admin ke master products dikhata hai. Har product ke andar `uom_prices` list hoti hai jo recommended units aur loose defaults batati hai.
 
-* **Query Params:** `search`, `category_id`, `sub_category_id`, `brand_id`, `page`
-* **Flutter Service Code:**
-```dart
-Future<ApiResponse<List<Map<String, dynamic>>>> getMasterCatalog({
-  String? search,
-  int? categoryId,
-  int page = 1,
-}) async {
-  final queryParams = {
-    if (search != null && search.isNotEmpty) 'search': search,
-    if (categoryId != null) 'category_id': categoryId.toString(),
-    'page': page.toString(),
-  };
-
-  final uri = Uri.parse('$baseUrl/vendor/products/catalog').replace(queryParameters: queryParams);
-  final response = await http.get(uri, headers: authHeaders);
-  final json = jsonDecode(response.body);
-
-  return ApiResponse.fromJson(json, (data) {
-    final list = data['data'] as List;
-    return list.cast<Map<String, dynamic>>();
-  });
+* **Response Payload Snippet:**
+```json
+{
+  "auth_status": true,
+  "res": "success",
+  "data": {
+    "data": [
+      {
+        "id": 1,
+        "name": "UltraTech Super PPC Cement",
+        "sku": "CEMENT-UT-50",
+        "base_uom": { "id": 1, "name": "Kilogram", "symbol": "kg" },
+        "is_already_added": false,
+        "uom_prices": [
+          {
+            "uom_id": 2,
+            "uom": { "name": "Bag (50 Kg)", "symbol": "bag" },
+            "conversion_factor": "50.0000",
+            "selling_price": "385.00",
+            "mrp": "420.00",
+            "allow_loose_sale": false,
+            "pack_contain_qty": "50.00",
+            "is_default_selling_unit": true
+          },
+          {
+            "uom_id": 1,
+            "uom": { "name": "Kilogram", "symbol": "kg" },
+            "conversion_factor": "1.0000",
+            "selling_price": "8.50",
+            "mrp": "10.00",
+            "allow_loose_sale": true,
+            "is_default_selling_unit": false
+          }
+        ]
+      }
+    ]
+  }
 }
 ```
 
 ---
 
-### B. Add Product to Inventory (`POST /vendor/products/add-to-inventory`)
-Master product select karke vendor apna stock aur amount set karega. Automatically **Opening Stock Ledger Entry** create ho jayegi.
+### B. Add Product to Inventory with Multi-UOM & Loose Control (`POST /vendor/products/add-to-inventory`)
 
-* **Request Body:**
+Jab vendor master product add karta hai, to wo har unit ke liye apna price aur **`allow_loose_sale`** toggle specify karta hai:
+
+#### 1. Full Package vs Loose Sale Concept:
+* `allow_loose_sale: false` ➔ **Full Pack Only.** Customer ko pura sealed pack (e.g., 50 Kg Bag / 16 Sq. Ft Box) hi buy karna hoga.
+* `allow_loose_sale: true` ➔ **Loose Allowed.** Customer khula retail (e.g., 5 Kg Cement ya 2 Loose Tiles) buy kar sakta hai.
+
+#### 2. Request Body Payload:
 ```json
 {
-  "product_id": 10,
-  "stock": 50,
-  "amount": 380.00,
-  "mrp": 420.00,
-  "min_order_qty": 1.0,
-  "notes": "Opening lot from warehouse"
+  "product_id": 1,
+  "stock": 200,
+  "notes": "Opening stock from warehouse",
+  "pricing_matrix": [
+    {
+      "uom_id": 2,
+      "conversion_factor": 50.0000,
+      "selling_price": 385.00,
+      "mrp": 420.00,
+      "allow_loose_sale": false,
+      "min_order_qty": 1.0,
+      "step_qty": 1.0,
+      "pack_contain_qty": 50.0,
+      "is_default_selling_unit": true
+    },
+    {
+      "uom_id": 1,
+      "conversion_factor": 1.0000,
+      "selling_price": 8.50,
+      "mrp": 10.00,
+      "allow_loose_sale": true,
+      "min_order_qty": 5.0,
+      "step_qty": 1.0,
+      "is_default_selling_unit": false
+    }
+  ]
 }
 ```
 
-* **Flutter Service Code:**
+> [!TIP]
+> **Backward Compatibility:** Agar purana client sirf `"amount": 385.00` aur `"stock": 200` bhejta hai, toh backend automatically default base UOM ke sath single pricing tier create kar dega.
+
+#### 3. Flutter Service Method:
 ```dart
 Future<ApiResponse<dynamic>> addProductToInventory({
   required int productId,
   required double stock,
-  required double amount,
-  double? mrp,
-  double minOrderQty = 1.0,
+  required List<VendorUomPrice> pricingMatrix,
   String? notes,
 }) async {
+  final defaultRow = pricingMatrix.firstWhere(
+    (e) => e.isDefaultSellingUnit,
+    orElse: () => pricingMatrix.first,
+  );
+
+  final body = {
+    'product_id': productId,
+    'stock': stock,
+    'amount': defaultRow.sellingPrice,
+    'mrp': defaultRow.mrp,
+    'min_order_qty': defaultRow.minOrderQty,
+    if (notes != null) 'notes': notes,
+    'pricing_matrix': pricingMatrix.map((e) => e.toJson()).toList(),
+  };
+
   final response = await http.post(
     Uri.parse('$baseUrl/vendor/products/add-to-inventory'),
     headers: authHeaders,
-    body: jsonEncode({
-      'product_id': productId,
-      'stock': stock,
-      'amount': amount,
-      if (mrp != null) 'mrp': mrp,
-      'min_order_qty': minOrderQty,
-      if (notes != null) 'notes': notes,
-    }),
+    body: jsonEncode(body),
   );
 
   return ApiResponse.fromJson(jsonDecode(response.body), (data) => data);
@@ -391,8 +511,45 @@ Future<ApiResponse<dynamic>> addProductToInventory({
 
 ---
 
-### C. Quick Stock Arrival (`POST /vendor/products/{id}/add-stock`)
-Jab naya shipment ya truck godown me aaye, vendor quick inward quantity enter karega:
+### C. Update Vendor Product Stock & UOM Rules (`PUT /vendor/products/{id}/update`)
+
+Vendor kisi bhi waqt apna price, physical stock count, ya loose sale permission update kar sakta hai:
+
+* **URL:** `/api/vendor/products/{vendor_product_id}/update`
+* **Request Body Payload:**
+```json
+{
+  "stock": 190,
+  "reason": "Physical godown count verification",
+  "pricing_matrix": [
+    {
+      "uom_id": 2,
+      "conversion_factor": 50.0000,
+      "selling_price": 390.00,
+      "mrp": 420.00,
+      "allow_loose_sale": false,
+      "min_order_qty": 1.0,
+      "step_qty": 1.0,
+      "is_default_selling_unit": true
+    },
+    {
+      "uom_id": 1,
+      "conversion_factor": 1.0000,
+      "selling_price": 9.00,
+      "mrp": 10.00,
+      "allow_loose_sale": true,
+      "min_order_qty": 5.0,
+      "step_qty": 1.0,
+      "is_default_selling_unit": false
+    }
+  ]
+}
+```
+
+---
+
+### D. Quick Stock Arrival (`POST /vendor/products/{id}/add-stock`)
+Jab naya shipment/truck godown me aaye, vendor quick inward quantity enter karega:
 
 * **URL:** `/api/vendor/products/{vendor_product_id}/add-stock`
 * **Request Body:**
@@ -400,27 +557,13 @@ Jab naya shipment ya truck godown me aaye, vendor quick inward quantity enter ka
 {
   "quantity_to_add": 100,
   "challan_or_invoice_no": "CH-2026-901",
-  "notes": "Received 100 bags from UltraTech distributor"
-}
-```
-* **Success Response:**
-```json
-{
-  "auth_status": true,
-  "res": "success",
-  "msg": "Successfully added 100 stock to inventory.",
-  "data": {
-    "vendor_product_id": 4,
-    "added_quantity": 100,
-    "current_stock": 150,
-    "is_available": true
-  }
+  "notes": "Received 100 bags from distributor"
 }
 ```
 
 ---
 
-### D. Stock Ledger Passbook (`GET /vendor/products/{id}/stock-ledger`)
+### E. Stock Ledger Passbook (`GET /vendor/products/{id}/stock-ledger`)
 Har product ki complete passbook (Kis date ko kitna stock aaya, kis order me kitna minus hua, audit adjustment kya hua).
 
 * **URL:** `/api/vendor/products/{vendor_product_id}/stock-ledger`
@@ -432,32 +575,21 @@ Har product ki complete passbook (Kis date ko kitna stock aaya, kis order me kit
   "msg": "Stock ledger fetched successfully.",
   "data": {
     "vendor_product_id": 4,
-    "product_name": "UltraTech Super Cement 50kg",
-    "current_stock": 150,
-    "base_uom": "Bag (50 Kg)",
+    "product_name": "UltraTech Super PPC Cement",
+    "current_stock": 250,
+    "base_uom": "Kilogram (kg)",
     "transactions": {
       "data": [
         {
           "id": 12,
-          "transaction_type": "stock_inward",
+          "transaction_type": "opening_stock",
           "flow": "inward",
-          "quantity": 100,
-          "balance_before": 50,
-          "balance_after": 150,
-          "reference_no": "CH-2026-901",
-          "remarks": "Received from truck",
-          "created_at": "2026-11-17T10:30:00Z"
-        },
-        {
-          "id": 9,
-          "transaction_type": "order_deduct",
-          "flow": "outward",
-          "quantity": 10,
-          "balance_before": 60,
-          "balance_after": 50,
-          "reference_no": "ORD-8941",
-          "remarks": "Customer Order Delivery",
-          "created_at": "2026-11-16T14:20:00Z"
+          "quantity": 250,
+          "balance_before": 0,
+          "balance_after": 250,
+          "reference_no": null,
+          "remarks": "Initial opening stock allotment",
+          "created_at": "2026-11-18T10:30:00Z"
         }
       ]
     }
@@ -477,8 +609,8 @@ GET /api/customer/products/{productId}/pricing-modal?vendor_id={vendorId}
                  │
                  ▼
 [ Step 2: Open Flutter BottomSheet / Dialog ]
- • Option A: Full Package (e.g. 1 Bag = ₹380)
- • Option B: Loose Sale   (e.g. 1 Kg = ₹8.50) [Only if available]
+ • Option A: Complete Package (e.g. 1 Bag = ₹385)
+ • Option B: Loose Sale       (e.g. 1 Kg = ₹8.50) [Only if vendor enabled allow_loose_sale!]
  • Quantity Selector (+ / -)
  • Real-time Calculation: Subtotal = Quantity × Unit Price
                  │
@@ -529,49 +661,116 @@ Future<ApiResponse<dynamic>> addToCart({
 }
 ```
 
-### C. Live Stock Validation Error Handling
-Agar customer vendor ke available stock se zyada quantity daalta hai, toh backend 400 error return karega:
+### C. Loose Sale Protection & Error Handling
+Agar customer aisi item par loose select karta hai jisko vendor ne **Full Pack Only (`allow_loose_sale: false`)** kiya hua hai, to backend `422` error return karta hai:
+
 ```json
 {
   "auth_status": true,
   "res": "error",
-  "msg": "Insufficient stock! Vendor only has 10 quantity available in stock.",
-  "data": {
-    "available_stock": 10
-  }
+  "msg": "This vendor does not allow loose sale for this item. Please select full package.",
+  "data": null
 }
 ```
-**Flutter Action:** SnackBar par direct `apiResponse.msg` show karein aur quantity selector ko max available stock par cap kar dein.
 
 ---
 
-## 7. Flutter UI/UX Recommendations for Developers
+## 7. Flutter UI/UX Widget Example: Loose vs Package Switch
 
-1. **SnackBar Helper Function:**
-   ```dart
-   void showApiMessage(BuildContext context, ApiResponse response) {
-     ScaffoldMessenger.of(context).showSnackBar(
-       SnackBar(
-         content: Text(response.msg),
-         backgroundColor: response.isSuccess ? Colors.green : Colors.red,
-       ),
-     );
-   }
-   ```
-2. **Dynamic Price Calculation on Client Side:**
-   Modal open hone par user jaise hi `+` ya `-` kare, subtotal UI me instant update hona chahiye:
-   ```dart
-   double calculateSubtotal(PricingOption selectedOption, double quantity) {
-     return selectedOption.sellingPrice * quantity;
-   }
-   ```
-3. **Out of Stock Prevention:**
-   Agar option ka `maxAvailableQty <= 0` ho, toh "Add to Cart" button ko disable kar dein aur label dikhayein: `"Out of Stock with this vendor"`.
+Vendor application me product add karte waqt har UOM ke card par SwitchListTile dikhayein:
+
+```dart
+Widget buildUomPriceRow(VendorUomPrice item, void Function(VendorUomPrice updated) onChanged) {
+  return Card(
+    margin: const EdgeInsets.symmetric(vertical: 8),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.between,
+            children: [
+              Text(
+                item.uomName ?? 'Selling Unit',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              if (item.isDefaultSellingUnit)
+                const Chip(
+                  label: Text('Default Unit', style: TextStyle(fontSize: 10, color: Colors.white)),
+                  backgroundColor: Colors.blue,
+                  visualDensity: VisualDensity.compact,
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          TextFormField(
+            initialValue: item.sellingPrice.toString(),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            decoration: const InputDecoration(
+              labelText: 'Selling Price (₹) *',
+              border: OutlineInputBorder(),
+              isDense: true,
+            ),
+            onChanged: (val) {
+              final p = double.tryParse(val) ?? item.sellingPrice;
+              onChanged(VendorUomPrice(
+                uomId: item.uomId,
+                uomName: item.uomName,
+                uomSymbol: item.uomSymbol,
+                conversionFactor: item.conversionFactor,
+                sellingPrice: p,
+                mrp: item.mrp,
+                allowLooseSale: item.allowLooseSale,
+                minOrderQty: item.minOrderQty,
+                stepQty: item.stepQty,
+                packContainQty: item.packContainQty,
+                isDefaultSellingUnit: item.isDefaultSellingUnit,
+              ));
+            },
+          ),
+          const SizedBox(height: 8),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Sell as Loose? (Khula bechna allow karein?)', style: TextStyle(fontSize: 14)),
+            subtitle: Text(
+              item.allowLooseSale ? 'Yes - Loose Retail Allowed' : 'No - Full Pack Only',
+              style: TextStyle(
+                fontSize: 12,
+                color: item.allowLooseSale ? Colors.green : Colors.red,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            value: item.allowLooseSale,
+            onChanged: (bool newVal) {
+              onChanged(VendorUomPrice(
+                uomId: item.uomId,
+                uomName: item.uomName,
+                uomSymbol: item.uomSymbol,
+                conversionFactor: item.conversionFactor,
+                sellingPrice: item.sellingPrice,
+                mrp: item.mrp,
+                allowLooseSale: newVal,
+                minOrderQty: item.minOrderQty,
+                stepQty: item.stepQty,
+                packContainQty: item.packContainQty,
+                isDefaultSellingUnit: item.isDefaultSellingUnit,
+              ));
+            },
+          ),
+        ],
+      ),
+    ),
+  );
+}
+```
 
 ---
 
 ## 8. Summary Checklist for Flutter Devs
-- [ ] Add `api_response.dart`, `vendor_product_item.dart`, `stock_ledger_item.dart`, aur `pricing_modal_data.dart` to models.
-- [ ] Implement `VendorProductService` for managing inventory and viewing stock ledger.
-- [ ] Implement `CustomerCartService` for the dynamic package/loose modal and cart operations.
-- [ ] Verify error handling: `response.msg` will always contain ready-to-display error messages.
+- [ ] Add `VendorUomPrice` model to `lib/models/vendor_uom_price.dart`.
+- [ ] Update `VendorProductItem` model with `List<VendorUomPrice> uomPrices`.
+- [ ] In `POST /vendor/products/add-to-inventory`, pass `pricing_matrix` with `allow_loose_sale` booleans.
+- [ ] In `GET /vendor/products/my-inventory`, display `Loose Allowed` / `Full Pack Only` badges using `uom_prices`.
+- [ ] In Customer App `GET /customer/products/{id}/pricing-modal`, verify that if vendor has `allow_loose_sale: false`, the loose radio option is hidden or disabled.

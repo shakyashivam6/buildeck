@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Catalog\BrandController;
 use App\Http\Controllers\Admin\Catalog\CategoryController;
 use App\Http\Controllers\Admin\Catalog\ProductController;
 use App\Http\Controllers\Admin\Catalog\UnitOfMeasureController;
+use App\Http\Controllers\Admin\Catalog\VendorStockController;
 use App\Http\Controllers\Admin\Onboard\CustomerController;
 use App\Http\Controllers\Admin\Onboard\VendorController;
 use App\Http\Controllers\AdminController;
@@ -78,6 +79,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::post('products', [ProductController::class, 'store'])->name('products.store');
         Route::post('products/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+        // Vendor Stock & Pricing Management
+        Route::get('vendor-stocks', [VendorStockController::class, 'index'])->name('vendor-stocks');
+        Route::post('vendor-stocks', [VendorStockController::class, 'store'])->name('vendor-stocks.store');
+        Route::post('vendor-stocks/{vendorProduct}/update', [VendorStockController::class, 'update'])->name('vendor-stocks.update');
+        Route::post('vendor-stocks/{vendorProduct}/add-stock', [VendorStockController::class, 'addStock'])->name('vendor-stocks.add-stock');
+        Route::post('vendor-stocks/{vendorProduct}/toggle-status', [VendorStockController::class, 'toggleStatus'])->name('vendor-stocks.toggle-status');
     });
 });
 
