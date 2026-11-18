@@ -1,6 +1,7 @@
 import AdminLayout from "@/Layouts/AdminLayout";
 import SearchableSelect from "@/Components/SearchableSelect";
 import InfoTooltip from "@/Components/InfoTooltip";
+import FormTrainingModal, { FormTrainingButton } from "@/Components/FormTrainingModal";
 import { Head, useForm, router } from "@inertiajs/react";
 import { useState, useMemo } from "react";
 
@@ -13,6 +14,7 @@ export default function ProductsIndex({
 }) {
     const [activeTab, setActiveTab] = useState('list'); // 'list' | 'form'
     const [editingProduct, setEditingProduct] = useState(null);
+    const [showProductTraining, setShowProductTraining] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [subCatFilter, setSubCatFilter] = useState(filters.sub_category_id || '');
@@ -288,8 +290,8 @@ export default function ProductsIndex({
             <Head title="Products & Multi-UOM Matrix - BuilDeck Admin" />
 
             {/* Navigation Tabs */}
-            <div className="row mb-3">
-                <div className="col-12">
+            <div className="row mb-3 align-items-center">
+                <div className="col-md-8">
                     <ul className="nav nav-pills bg-body-secondary p-1 rounded d-inline-flex">
                         <li className="nav-item">
                             <button
@@ -313,6 +315,12 @@ export default function ProductsIndex({
                             </button>
                         </li>
                     </ul>
+                </div>
+                <div className="col-md-4 text-md-end mt-2 mt-md-0">
+                    <FormTrainingButton
+                        onClick={() => setShowProductTraining(true)}
+                        label="Product Onboarding Guide"
+                    />
                 </div>
             </div>
 
@@ -472,11 +480,15 @@ export default function ProductsIndex({
             {/* TAB 2: CREATE / EDIT MULTI-UOM FORM */}
             {activeTab === 'form' && (
                 <div className="card shadow-sm border-0">
-                    <div className="card-header bg-transparent py-3 border-bottom">
+                    <div className="card-header bg-transparent py-3 border-bottom d-flex justify-content-between align-items-center">
                         <h5 className="card-title mb-0 fw-semibold">
                             <i className="ri-shopping-basket-line me-2 text-primary"></i>
                             {editingProduct ? `Edit Product (${editingProduct.name})` : "Create New Product with Images & Multi-UOM Entry Matrix"}
                         </h5>
+                        <FormTrainingButton
+                            onClick={() => setShowProductTraining(true)}
+                            label="Product & Multi-UOM Guide"
+                        />
                     </div>
                     <div className="card-body">
                         <form onSubmit={handleSubmit}>
@@ -733,9 +745,15 @@ export default function ProductsIndex({
                                         Define unit-wise price tiers and whether each unit can be sold as loose or in sealed full packs only.
                                     </small>
                                 </div>
-                                <button type="button" className="btn btn-outline-primary btn-sm" onClick={addMatrixRow}>
-                                    <i className="ri-add-line me-1"></i> Add Unit Tier
-                                </button>
+                                <div className="d-flex align-items-center gap-2">
+                                    <FormTrainingButton
+                                        onClick={() => setShowProductTraining(true)}
+                                        label="Matrix Training"
+                                    />
+                                    <button type="button" className="btn btn-outline-primary btn-sm" onClick={addMatrixRow}>
+                                        <i className="ri-add-line me-1"></i> Add Unit Tier
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="table-responsive mb-4" style={{ overflow: 'visible' }}>
@@ -943,6 +961,13 @@ export default function ProductsIndex({
                     </div>
                 </div>
             )}
+
+            {/* Product Onboarding Training Guide Modal */}
+            <FormTrainingModal
+                isOpen={showProductTraining}
+                onClose={() => setShowProductTraining(false)}
+                formKey="product"
+            />
         </AdminLayout>
     );
 }

@@ -1,5 +1,6 @@
 import AdminLayout from "@/Layouts/AdminLayout";
 import SearchableSelect from "@/Components/SearchableSelect";
+import FormTrainingModal, { FormTrainingButton } from "@/Components/FormTrainingModal";
 import { Head, useForm, router } from "@inertiajs/react";
 import { useState, useMemo } from "react";
 
@@ -10,6 +11,10 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
     const selectedCategory = useMemo(() => {
         return categories.find(c => c.id === selectedCategoryId) || categories[0] || null;
     }, [categories, selectedCategoryId]);
+
+    // Training Modals State
+    const [showCategoryTraining, setShowCategoryTraining] = useState(false);
+    const [showSubCategoryTraining, setShowSubCategoryTraining] = useState(false);
 
     // Format UOMs for SearchableSelect
     const formattedUoms = useMemo(() => {
@@ -175,12 +180,18 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                                 <i className="ri-folder-3-line me-2 text-primary"></i>
                                 Main Categories
                             </h5>
-                            <button
-                                className="btn btn-sm btn-outline-primary"
-                                onClick={openCreateCategoryModal}
-                            >
-                                <i className="ri-add-line me-1"></i> New Category
-                            </button>
+                            <div className="d-flex align-items-center gap-1">
+                                <FormTrainingButton
+                                    onClick={() => setShowCategoryTraining(true)}
+                                    label="Guide"
+                                />
+                                <button
+                                    className="btn btn-sm btn-outline-primary"
+                                    onClick={openCreateCategoryModal}
+                                >
+                                    <i className="ri-add-line me-1"></i> New
+                                </button>
+                            </div>
                         </div>
                         <div className="list-group list-group-flush">
                             {categories.map((cat) => {
@@ -260,6 +271,10 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                                 </div>
 
                                 <div className="d-flex align-items-center gap-2">
+                                    <FormTrainingButton
+                                        onClick={() => setShowSubCategoryTraining(true)}
+                                        label="Sub-Category Guide"
+                                    />
                                     {selectedCategory && (
                                         <>
                                             <button
@@ -279,7 +294,7 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                                         </>
                                     )}
                                     <button
-                                        className="btn btn-sm btn-success ms-2"
+                                        className="btn btn-sm btn-success ms-1"
                                         onClick={openCreateSubModal}
                                     >
                                         <i className="ri-add-line me-1"></i> Add Sub-Category
@@ -377,10 +392,16 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                 <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
                     <div className="modal-dialog">
                         <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">
-                                    {editingCategory ? `Edit Category: ${editingCategory.name}` : 'Create Main Category'}
-                                </h5>
+                            <div className="modal-header d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center gap-2">
+                                    <h5 className="modal-title mb-0">
+                                        {editingCategory ? `Edit Category: ${editingCategory.name}` : 'Create Main Category'}
+                                    </h5>
+                                    <FormTrainingButton
+                                        onClick={() => setShowCategoryTraining(true)}
+                                        label="Input Training"
+                                    />
+                                </div>
                                 <button type="button" className="btn-close" onClick={() => setShowCategoryModal(false)}></button>
                             </div>
                             <form onSubmit={submitCategory}>
@@ -447,10 +468,16 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                 <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
                     <div className="modal-dialog">
                         <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">
-                                    {editingSubCategory ? `Edit Sub-Category: ${editingSubCategory.name}` : `Add Sub-Category to ${selectedCategory?.name}`}
-                                </h5>
+                            <div className="modal-header d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center gap-2">
+                                    <h5 className="modal-title mb-0">
+                                        {editingSubCategory ? `Edit Sub-Category: ${editingSubCategory.name}` : `Add Sub-Category to ${selectedCategory?.name}`}
+                                    </h5>
+                                    <FormTrainingButton
+                                        onClick={() => setShowSubCategoryTraining(true)}
+                                        label="Input Training"
+                                    />
+                                </div>
                                 <button type="button" className="btn-close" onClick={() => setShowSubModal(false)}></button>
                             </div>
                             <form onSubmit={submitSubCategory}>
@@ -552,6 +579,19 @@ export default function CategoriesIndex({ categories = [], uoms = [] }) {
                     </div>
                 </div>
             )}
+
+            {/* Form Training Modals */}
+            <FormTrainingModal
+                isOpen={showCategoryTraining}
+                onClose={() => setShowCategoryTraining(false)}
+                formKey="category"
+            />
+
+            <FormTrainingModal
+                isOpen={showSubCategoryTraining}
+                onClose={() => setShowSubCategoryTraining(false)}
+                formKey="subCategory"
+            />
         </AdminLayout>
     );
 }

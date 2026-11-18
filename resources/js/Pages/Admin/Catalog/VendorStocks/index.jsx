@@ -1,6 +1,7 @@
 import AdminLayout from "@/Layouts/AdminLayout";
 import SearchableSelect from "@/Components/SearchableSelect";
 import InfoTooltip from "@/Components/InfoTooltip";
+import FormTrainingModal, { FormTrainingButton } from "@/Components/FormTrainingModal";
 import { Head, useForm, router, Link } from "@inertiajs/react";
 import { useState, useMemo } from "react";
 
@@ -93,6 +94,10 @@ export default function VendorStocksIndex({
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedVP, setSelectedVP] = useState(null);
 
+    // Training Guide Modals
+    const [showAssignTraining, setShowAssignTraining] = useState(false);
+    const [showStockInwardTraining, setShowStockInwardTraining] = useState(false);
+
     // Form 1: Assign Product
     const assignForm = useForm({
         vendor_id: '',
@@ -126,6 +131,23 @@ export default function VendorStocksIndex({
         if (!assignForm.data.product_id) return null;
         return masterProducts.find((p) => p.id === parseInt(assignForm.data.product_id)) || null;
     }, [assignForm.data.product_id, masterProducts]);
+
+    const stockReceivingUnitOptions = useMemo(() => {
+        if (assignForm.data.pricing_matrix.length > 0) {
+            return assignForm.data.pricing_matrix.map((r) => {
+                const uomObj = unitsOfMeasure.find((u) => u.id === parseInt(r.uom_id));
+                const factorStr = parseFloat(r.conversion_factor) !== 1 ? ` [×${r.conversion_factor} base]` : ' [Base Unit]';
+                return {
+                    id: r.uom_id,
+                    name: uomObj ? `${uomObj.name} (${uomObj.symbol})${factorStr}` : `Unit #${r.uom_id}${factorStr}`,
+                };
+            });
+        }
+        return selectedMasterProduct?.base_uom ? [{
+            id: selectedMasterProduct.base_uom_id,
+            name: `${selectedMasterProduct.base_uom.name} (${selectedMasterProduct.base_uom.symbol}) [Base Unit]`,
+        }] : [];
+    }, [assignForm.data.pricing_matrix, unitsOfMeasure, selectedMasterProduct]);
 
     // When Master Product is chosen in Assign Modal
     const handleAssignProductSelect = (productId) => {
@@ -434,7 +456,7 @@ export default function VendorStocksIndex({
             <Head title="Vendor Stock & Ledger Management" />
 
             <div className="card mb-4 shadow-sm">
-                <div className="card-header border-bottom bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div className="card-header border-bottom bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <h4 className="card-title mb-1 fw-bold text-primary">Vendor Stock & Inventory Ledger</h4>
                         <p className="text-muted small mb-0">Control vendor inventory, multi-UOM packaging rules, loose-sale toggles, and transaction audit trails.</p>
@@ -454,23 +476,29 @@ export default function VendorStocksIndex({
                             <i className="ri-file-list-3-line me-1"></i> Stock Ledger (Audit)
                         </button>
                         {activeTab === 'inventory' && (
-                            <button
-                                className="btn btn-sm btn-success"
-                                onClick={() => {
-                                    assignForm.reset();
-                                    assignForm.setData({
-                                        vendor_id: '',
-                                        product_id: '',
-                                        stock: '0',
-                                        stock_uom_id: '',
-                                        notes: '',
-                                        pricing_matrix: [],
-                                    });
-                                    setIsAssignModalOpen(true);
-                                }}
-                            >
-                                <i className="ri-add-line me-1"></i> Assign Product to Vendor
-                            </button>
+                            <div className="d-flex align-items-center gap-2">
+                                <FormTrainingButton
+                                    onClick={() => setShowAssignTraining(true)}
+                                    label="Assignment Guide"
+                                />
+                                <button
+                                    className="btn btn-sm btn-success"
+                                    onClick={() => {
+                                        assignForm.reset();
+                                        assignForm.setData({
+                                            vendor_id: '',
+                                            product_id: '',
+                                            stock: '0',
+                                            stock_uom_id: '',
+                                            notes: '',
+                                            pricing_matrix: [],
+                                        });
+                                        setIsAssignModalOpen(true);
+                                    }}
+                                >
+                                    <i className="ri-add-line me-1"></i> Assign Product to Vendor
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -479,7 +507,7 @@ export default function VendorStocksIndex({
                 {activeTab === 'inventory' && (
                     <div className="card-body">
                         {/* Filter Bar */}
-                        <div className="row g-2 mb-3 bg-light p-3 rounded align-items-end">
+                        <div className="row g-2 mb-3 bg-body-secondary p-3 rounded align-items-end">
                             <div className="col-md-3">
                                 <label className="form-label small fw-semibold">Filter by Vendor</label>
                                 <SearchableSelect
@@ -527,7 +555,7 @@ export default function VendorStocksIndex({
                         {/* Inventory Table */}
                         <div className="table-responsive">
                             <table className="table table-hover align-middle mb-0">
-                                <thead className="table-light text-muted small text-uppercase">
+                                <thead className="table-light text-body-secondary small text-uppercase">
                                     <tr>
                                         <th>Product</th>
                                         <th>Vendor</th>
@@ -555,8 +583,8 @@ export default function VendorStocksIndex({
                                             return (
                                                 <tr key={vp.id}>
                                                     <td>
-                                                        <div className="fw-semibold text-dark">{vp.product?.name}</div>
-                                                        <span className="badge bg-light text-muted border">SKU: {vp.product?.sku || 'N/A'}</span>
+                                                        <div className="fw-semibold text-body">{vp.product?.name}</div>
+                                                        <span className="badge bg-body-secondary text-body-secondary border">SKU: {vp.product?.sku || 'N/A'}</span>
                                                     </td>
                                                     <td>
                                                         <div className="fw-medium text-primary">{vp.vendor?.vendor_name}</div>
@@ -575,7 +603,7 @@ export default function VendorStocksIndex({
                                                     <td>
                                                         <div className="d-flex flex-wrap gap-1" style={{ maxWidth: '300px' }}>
                                                             {uomList.length === 0 ? (
-                                                                <span className="badge bg-light text-dark border">
+                                                                <span className="badge bg-body-secondary text-body border">
                                                                     {vp.product?.base_uom?.name || 'Base Unit'} (₹{parseFloat(vp.amount).toFixed(2)})
                                                                 </span>
                                                             ) : (
@@ -596,7 +624,7 @@ export default function VendorStocksIndex({
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <div className="fw-bold text-dark fs-14">₹{parseFloat(vp.amount).toFixed(2)}</div>
+                                                        <div className="fw-bold text-body fs-14">₹{parseFloat(vp.amount).toFixed(2)}</div>
                                                         {vp.mrp && (
                                                             <small className="text-muted text-decoration-line-through fs-11">MRP: ₹{parseFloat(vp.mrp).toFixed(2)}</small>
                                                         )}
@@ -658,7 +686,7 @@ export default function VendorStocksIndex({
                 {activeTab === 'ledger' && (
                     <div className="card-body">
                         {/* Filter Bar */}
-                        <div className="row g-2 mb-3 bg-light p-3 rounded align-items-end">
+                        <div className="row g-2 mb-3 bg-body-secondary p-3 rounded align-items-end">
                             <div className="col-md-3">
                                 <label className="form-label small fw-semibold">Vendor</label>
                                 <SearchableSelect
@@ -705,7 +733,7 @@ export default function VendorStocksIndex({
                         {/* Ledger Passbook Table */}
                         <div className="table-responsive">
                             <table className="table table-hover align-middle mb-0">
-                                <thead className="table-light text-muted small text-uppercase">
+                                <thead className="table-light text-body-secondary small text-uppercase">
                                     <tr>
                                         <th>Date & Time</th>
                                         <th>Product</th>
@@ -740,13 +768,13 @@ export default function VendorStocksIndex({
                                                         })}
                                                     </td>
                                                     <td>
-                                                        <span className="fw-semibold text-dark">{row.product?.name}</span>
+                                                        <span className="fw-semibold text-body">{row.product?.name}</span>
                                                     </td>
                                                     <td>
                                                         <span className="text-primary">{row.vendor?.vendor_name}</span>
                                                     </td>
                                                     <td>
-                                                        <span className="badge bg-light text-dark border">
+                                                        <span className="badge bg-body-secondary text-body border">
                                                             {row.transaction_type.replace(/_/g, ' ').toUpperCase()}
                                                         </span>
                                                     </td>
@@ -756,11 +784,11 @@ export default function VendorStocksIndex({
                                                     <td className={`text-end font-monospace fw-bold ${isInward ? 'text-success' : 'text-danger'}`}>
                                                         {isInward ? '+' : '-'}{parseFloat(row.quantity).toFixed(2)} {row.product?.base_uom?.symbol}
                                                     </td>
-                                                    <td className="text-end font-monospace fw-bold text-dark">
+                                                    <td className="text-end font-monospace fw-bold text-body">
                                                         {parseFloat(row.balance_after).toFixed(2)}
                                                     </td>
                                                     <td className="small">
-                                                        <div className="text-dark fw-medium">{row.reference_number || '-'}</div>
+                                                        <div className="text-body fw-medium">{row.reference_number || '-'}</div>
                                                         <div className="text-muted">{row.notes || ''}</div>
                                                     </td>
                                                     <td className="small text-muted">
@@ -796,20 +824,27 @@ export default function VendorStocksIndex({
                     <div className="modal-dialog modal-xl modal-dialog-centered my-3" style={{ maxHeight: '92vh' }}>
                         <div className="modal-content shadow-lg border-0 d-flex flex-column" style={{ maxHeight: '92vh', overflow: 'hidden' }}>
                             <form onSubmit={handleAssignSubmit} className="d-flex flex-column flex-grow-1" style={{ minHeight: 0, maxHeight: '92vh' }}>
-                                <div className="modal-header bg-primary text-white py-3 flex-shrink-0">
+                                <div className="modal-header bg-primary text-white py-3 flex-shrink-0 d-flex justify-content-between align-items-center">
                                     <div>
                                         <h5 className="modal-title fw-bold mb-0 text-white">
                                             <i className="ri-store-3-line me-2"></i>Assign Product to Vendor
                                         </h5>
                                         <small className="opacity-75">Configure vendor inventory, multi-UOM rates, and loose-sale packaging rules</small>
                                     </div>
-                                    <button type="button" className="btn-close btn-close-white" onClick={() => setIsAssignModalOpen(false)}></button>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <FormTrainingButton
+                                            onClick={() => setShowAssignTraining(true)}
+                                            label="Assignment Guide"
+                                            className="btn btn-light btn-sm text-primary fw-semibold d-inline-flex align-items-center gap-1 shadow-sm"
+                                        />
+                                        <button type="button" className="btn-close btn-close-white" onClick={() => setIsAssignModalOpen(false)}></button>
+                                    </div>
                                 </div>
                                 <div className="modal-body p-4 flex-grow-1" style={{ overflowY: 'auto', minHeight: 0 }}>
                                     {/* Section 1: Vendor & Master Product */}
                                     <div className="row g-3 mb-3">
                                         <div className="col-md-6">
-                                            <label className="form-label small fw-semibold text-dark">Select Vendor *</label>
+                                            <label className="form-label small fw-semibold text-body">Select Vendor *</label>
                                             <SearchableSelect
                                                 options={vendorAssignOptions}
                                                 value={assignForm.data.vendor_id}
@@ -823,7 +858,7 @@ export default function VendorStocksIndex({
                                         </div>
 
                                         <div className="col-md-6">
-                                            <label className="form-label small fw-semibold text-dark">Select Master Product *</label>
+                                            <label className="form-label small fw-semibold text-body">Select Master Product *</label>
                                             <SearchableSelect
                                                 options={productAssignOptions}
                                                 value={assignForm.data.product_id}
@@ -839,10 +874,10 @@ export default function VendorStocksIndex({
 
                                     {/* Product Details Header & Base Unit Notice */}
                                     {selectedMasterProduct && (
-                                        <div className="p-3 mb-3 bg-light border rounded d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <div className="p-3 mb-3 bg-body-secondary border rounded d-flex align-items-center justify-content-between flex-wrap gap-2">
                                             <div>
                                                 <span className="badge bg-primary me-2">Master Product</span>
-                                                <span className="fw-bold text-dark fs-15">{selectedMasterProduct.name}</span>
+                                                <span className="fw-bold text-body fs-15">{selectedMasterProduct.name}</span>
                                                 <span className="text-muted ms-2 small">SKU: {selectedMasterProduct.sku || 'N/A'}</span>
                                             </div>
                                             <div className="d-flex align-items-center gap-2">
@@ -854,9 +889,9 @@ export default function VendorStocksIndex({
                                     )}
 
                                     {/* Section 2: Initial Inward Stock & Unit Conversion */}
-                                    <div className="row g-3 mb-4 bg-light-subtle p-3 border rounded">
+                                    <div className="row g-3 mb-4 bg-body-secondary p-3 border rounded">
                                         <div className="col-md-4">
-                                            <label className="form-label small fw-semibold text-dark mb-1">
+                                            <label className="form-label small fw-semibold text-body mb-1">
                                                 Initial Opening Stock *
                                             </label>
                                             <input
@@ -873,37 +908,22 @@ export default function VendorStocksIndex({
                                         </div>
 
                                         <div className="col-md-4">
-                                            <label className="form-label small fw-semibold text-dark mb-1">
+                                            <label className="form-label small fw-semibold text-body mb-1">
                                                 Stock Receiving Unit
                                             </label>
-                                            <select
-                                                className="form-select"
+                                            <SearchableSelect
+                                                options={stockReceivingUnitOptions}
                                                 value={assignForm.data.stock_uom_id}
-                                                onChange={(e) => assignForm.setData('stock_uom_id', e.target.value)}
-                                            >
-                                                {assignForm.data.pricing_matrix.length > 0 ? (
-                                                    assignForm.data.pricing_matrix.map((r) => {
-                                                        const uomObj = unitsOfMeasure.find((u) => u.id === parseInt(r.uom_id));
-                                                        return (
-                                                            <option key={r.uom_id} value={r.uom_id}>
-                                                                {uomObj ? `${uomObj.name} (${uomObj.symbol})` : `Unit #${r.uom_id}`}
-                                                                {parseFloat(r.conversion_factor) !== 1 ? ` [×${r.conversion_factor} base]` : ' [Base Unit]'}
-                                                            </option>
-                                                        );
-                                                    })
-                                                ) : (
-                                                    <option value={selectedMasterProduct?.base_uom_id || ''}>
-                                                        {selectedMasterProduct?.base_uom?.name || 'Base Unit'}
-                                                    </option>
-                                                )}
-                                            </select>
+                                                onChange={(val) => assignForm.setData('stock_uom_id', val)}
+                                                placeholder="-- Choose Stock Receiving Unit --"
+                                            />
                                         </div>
 
                                         <div className="col-md-4">
                                             <label className="form-label small fw-semibold text-muted mb-1">
                                                 Converted Base Stock (Ledger)
                                             </label>
-                                            <div className="form-control bg-white fw-bold text-success border-success-subtle d-flex align-items-center justify-content-between">
+                                            <div className="form-control bg-body fw-bold text-success border-success-subtle d-flex align-items-center justify-content-between">
                                                 <span>{assignCalculatedBaseStock}</span>
                                                 <span className="badge bg-success-subtle text-success">
                                                     {selectedMasterProduct?.base_uom?.symbol || 'Base Unit'}
@@ -923,7 +943,7 @@ export default function VendorStocksIndex({
                                     </div>
 
                                     {/* Section 3: Vendor Multi-UOM Pricing & Loose-Sale Rules (1st Screenshot Matrix) */}
-                                    <div className="border rounded p-3 bg-white shadow-sm">
+                                    <div className="border rounded p-3 bg-body shadow-sm">
                                         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                             <div>
                                                 <h6 className="fw-bold text-primary mb-1 d-flex align-items-center">
@@ -967,7 +987,7 @@ export default function VendorStocksIndex({
                                         ) : (
                                             <div className="table-responsive">
                                                 <table className="table table-bordered table-sm align-middle text-nowrap mb-0">
-                                                    <thead className="table-light text-muted small text-uppercase">
+                                                    <thead className="table-light text-body-secondary small text-uppercase">
                                                         <tr>
                                                             <th style={{ minWidth: '190px' }}>UOM (Selling Unit) *</th>
                                                             <th style={{ width: '120px' }}>Selling Price (₹) *</th>
@@ -1147,7 +1167,7 @@ export default function VendorStocksIndex({
                                         )}
                                     </div>
                                 </div>
-                                <div className="modal-footer bg-light flex-shrink-0 border-top">
+                                <div className="modal-footer bg-body-tertiary flex-shrink-0 border-top">
                                     <button type="button" className="btn btn-secondary btn-sm" onClick={() => setIsAssignModalOpen(false)}>Cancel</button>
                                     <button type="submit" className="btn btn-primary btn-sm px-3" disabled={assignForm.processing}>
                                         {assignForm.processing ? 'Saving...' : 'Save & Assign Product'}
@@ -1165,13 +1185,19 @@ export default function VendorStocksIndex({
                     <div className="modal-dialog modal-dialog-centered my-3">
                         <div className="modal-content shadow">
                             <form onSubmit={handleAddStockSubmit}>
-                                <div className="modal-header">
-                                    <h5 className="modal-title fw-bold">Add Inward Stock Arrival</h5>
+                                <div className="modal-header d-flex justify-content-between align-items-center">
+                                    <div className="d-flex align-items-center gap-2">
+                                        <h5 className="modal-title fw-bold mb-0">Add Inward Stock Arrival</h5>
+                                        <FormTrainingButton
+                                            onClick={() => setShowStockInwardTraining(true)}
+                                            label="Stock Inward Guide"
+                                        />
+                                    </div>
                                     <button type="button" className="btn-close" onClick={() => setIsAddStockModalOpen(false)}></button>
                                 </div>
                                 <div className="modal-body">
-                                    <div className="p-3 mb-3 bg-light rounded border">
-                                        <div className="fw-semibold text-dark fs-15">{selectedVP.product?.name}</div>
+                                    <div className="p-3 mb-3 bg-body-secondary rounded border">
+                                        <div className="fw-semibold text-body fs-15">{selectedVP.product?.name}</div>
                                         <div className="text-muted small">Vendor: {selectedVP.vendor?.vendor_name}</div>
                                         <div className="text-primary fw-bold mt-1">
                                             Current Base Stock: {parseFloat(selectedVP.stock).toFixed(2)} {selectedVP.product?.base_uom?.symbol}
@@ -1232,19 +1258,26 @@ export default function VendorStocksIndex({
                     <div className="modal-dialog modal-xl modal-dialog-centered my-3" style={{ maxHeight: '92vh' }}>
                         <div className="modal-content shadow-lg border-0 d-flex flex-column" style={{ maxHeight: '92vh', overflow: 'hidden' }}>
                             <form onSubmit={handleEditSubmit} className="d-flex flex-column flex-grow-1" style={{ minHeight: 0, maxHeight: '92vh' }}>
-                                <div className="modal-header bg-primary text-white py-3 flex-shrink-0">
+                                <div className="modal-header bg-primary text-white py-3 flex-shrink-0 d-flex justify-content-between align-items-center">
                                     <div>
                                         <h5 className="modal-title fw-bold mb-0 text-white">
                                             <i className="ri-edit-line me-2"></i>Manage Vendor Product Stock & Packaging
                                         </h5>
                                         <small className="opacity-75">Adjust inventory and configure vendor-specific unit pricing and loose sale rules</small>
                                     </div>
-                                    <button type="button" className="btn-close btn-close-white" onClick={() => setIsEditModalOpen(false)}></button>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <FormTrainingButton
+                                            onClick={() => setShowAssignTraining(true)}
+                                            label="Stock & Pricing Guide"
+                                            className="btn btn-light btn-sm text-primary fw-semibold d-inline-flex align-items-center gap-1 shadow-sm"
+                                        />
+                                        <button type="button" className="btn-close btn-close-white" onClick={() => setIsEditModalOpen(false)}></button>
+                                    </div>
                                 </div>
                                 <div className="modal-body p-4 flex-grow-1" style={{ overflowY: 'auto', minHeight: 0 }}>
-                                    <div className="p-3 mb-3 bg-light rounded border d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div className="p-3 mb-3 bg-body-secondary rounded border d-flex justify-content-between align-items-center flex-wrap gap-2">
                                         <div>
-                                            <div className="fw-bold text-dark fs-15">{selectedVP.product?.name}</div>
+                                            <div className="fw-bold text-body fs-15">{selectedVP.product?.name}</div>
                                             <div className="text-muted small">Vendor: {selectedVP.vendor?.vendor_name} ({selectedVP.vendor?.owner_name})</div>
                                         </div>
                                         <div>
@@ -1255,9 +1288,9 @@ export default function VendorStocksIndex({
                                     </div>
 
                                     {/* Physical Stock Audit Adjustment */}
-                                    <div className="row g-3 mb-4 bg-light-subtle p-3 border rounded">
+                                    <div className="row g-3 mb-4 bg-body-secondary p-3 border rounded">
                                         <div className="col-md-6">
-                                            <label className="form-label small fw-semibold text-dark">
+                                            <label className="form-label small fw-semibold text-body">
                                                 Target Base Stock ({selectedVP.product?.base_uom?.symbol})
                                             </label>
                                             <input
@@ -1271,7 +1304,7 @@ export default function VendorStocksIndex({
                                             <small className="text-muted">Modifying this will generate an automatic audit adjustment ledger passbook entry.</small>
                                         </div>
                                         <div className="col-md-6">
-                                            <label className="form-label small fw-semibold text-dark">
+                                            <label className="form-label small fw-semibold text-body">
                                                 Reason for Stock Count Audit
                                             </label>
                                             <input
@@ -1285,7 +1318,7 @@ export default function VendorStocksIndex({
                                     </div>
 
                                     {/* Multi-UOM Pricing Matrix for Vendor */}
-                                    <div className="border rounded p-3 bg-white shadow-sm">
+                                    <div className="border rounded p-3 bg-body shadow-sm">
                                         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                                             <div>
                                                 <h6 className="fw-bold text-primary mb-1 d-flex align-items-center">
@@ -1322,7 +1355,7 @@ export default function VendorStocksIndex({
 
                                         <div className="table-responsive">
                                             <table className="table table-bordered table-sm align-middle text-nowrap mb-0">
-                                                <thead className="table-light text-muted small text-uppercase">
+                                                <thead className="table-light text-body-secondary small text-uppercase">
                                                     <tr>
                                                         <th style={{ minWidth: '190px' }}>UOM (Selling Unit) *</th>
                                                         <th style={{ width: '120px' }}>Selling Price (₹) *</th>
@@ -1474,7 +1507,7 @@ export default function VendorStocksIndex({
                                         </div>
                                     </div>
                                 </div>
-                                <div className="modal-footer bg-light flex-shrink-0 border-top">
+                                <div className="modal-footer bg-body-tertiary flex-shrink-0 border-top">
                                     <button type="button" className="btn btn-secondary btn-sm" onClick={() => setIsEditModalOpen(false)}>Cancel</button>
                                     <button type="submit" className="btn btn-primary btn-sm px-3" disabled={editForm.processing}>
                                         {editForm.processing ? 'Updating...' : 'Update Vendor Product'}
@@ -1485,6 +1518,19 @@ export default function VendorStocksIndex({
                     </div>
                 </div>
             )}
+
+            {/* Training Guide Modals */}
+            <FormTrainingModal
+                isOpen={showAssignTraining}
+                onClose={() => setShowAssignTraining(false)}
+                formKey="assignVendorProduct"
+            />
+
+            <FormTrainingModal
+                isOpen={showStockInwardTraining}
+                onClose={() => setShowStockInwardTraining(false)}
+                formKey="stockInward"
+            />
         </AdminLayout>
     );
 }

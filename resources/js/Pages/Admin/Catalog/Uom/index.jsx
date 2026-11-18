@@ -1,5 +1,6 @@
 import AdminLayout from "@/Layouts/AdminLayout";
 import SearchableSelect from "@/Components/SearchableSelect";
+import FormTrainingModal, { FormTrainingButton } from "@/Components/FormTrainingModal";
 import { Head, useForm } from "@inertiajs/react";
 import { useState } from "react";
 
@@ -15,6 +16,7 @@ const unitCategoryOptions = [
 export default function UomIndex({ uoms = { data: [] } }) {
     const [editingUom, setEditingUom] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [showUomTraining, setShowUomTraining] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
@@ -89,9 +91,15 @@ export default function UomIndex({ uoms = { data: [] } }) {
                         </h5>
                         <small className="text-muted">Master table for all physical and packaging units</small>
                     </div>
-                    <button className="btn btn-primary btn-sm" onClick={openCreateModal}>
-                        <i className="ri-add-line me-1"></i> Add Unit
-                    </button>
+                    <div className="d-flex align-items-center gap-2">
+                        <FormTrainingButton
+                            onClick={() => setShowUomTraining(true)}
+                            label="UOM Guide"
+                        />
+                        <button className="btn btn-primary btn-sm" onClick={openCreateModal}>
+                            <i className="ri-add-line me-1"></i> Add Unit
+                        </button>
+                    </div>
                 </div>
 
                 <div className="card-body p-0">
@@ -158,8 +166,14 @@ export default function UomIndex({ uoms = { data: [] } }) {
                 <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
                     <div className="modal-dialog">
                         <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">{editingUom ? 'Edit UOM' : 'Add Unit of Measure'}</h5>
+                            <div className="modal-header d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center gap-2">
+                                    <h5 className="modal-title mb-0">{editingUom ? 'Edit UOM' : 'Add Unit of Measure'}</h5>
+                                    <FormTrainingButton
+                                        onClick={() => setShowUomTraining(true)}
+                                        label="Input Guide"
+                                    />
+                                </div>
                                 <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
                             </div>
                             <form onSubmit={handleSubmit}>
@@ -233,6 +247,13 @@ export default function UomIndex({ uoms = { data: [] } }) {
                     </div>
                 </div>
             )}
+
+            {/* UOM Training Guide Modal */}
+            <FormTrainingModal
+                isOpen={showUomTraining}
+                onClose={() => setShowUomTraining(false)}
+                formKey="uom"
+            />
         </AdminLayout>
     );
 }

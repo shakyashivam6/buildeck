@@ -1,10 +1,12 @@
 import AdminLayout from "@/Layouts/AdminLayout";
+import FormTrainingModal, { FormTrainingButton } from "@/Components/FormTrainingModal";
 import { Head, useForm } from "@inertiajs/react";
 import { useState } from "react";
 
 export default function BrandsIndex({ brands = { data: [] }, subCategories = [] }) {
     const [editingBrand, setEditingBrand] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [showBrandTraining, setShowBrandTraining] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
@@ -77,9 +79,15 @@ export default function BrandsIndex({ brands = { data: [] }, subCategories = [] 
                         </h5>
                         <small className="text-muted">Master brands approved for building material catalog</small>
                     </div>
-                    <button className="btn btn-primary btn-sm" onClick={openCreateModal}>
-                        <i className="ri-add-line me-1"></i> Add Brand
-                    </button>
+                    <div className="d-flex align-items-center gap-2">
+                        <FormTrainingButton
+                            onClick={() => setShowBrandTraining(true)}
+                            label="Brand Guide"
+                        />
+                        <button className="btn btn-primary btn-sm" onClick={openCreateModal}>
+                            <i className="ri-add-line me-1"></i> Add Brand
+                        </button>
+                    </div>
                 </div>
 
                 <div className="card-body p-0">
@@ -164,8 +172,14 @@ export default function BrandsIndex({ brands = { data: [] }, subCategories = [] 
                 <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
                     <div className="modal-dialog modal-lg">
                         <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">{editingBrand ? 'Edit Brand' : 'Add Master Brand'}</h5>
+                            <div className="modal-header d-flex justify-content-between align-items-center">
+                                <div className="d-flex align-items-center gap-2">
+                                    <h5 className="modal-title mb-0">{editingBrand ? 'Edit Brand' : 'Add Master Brand'}</h5>
+                                    <FormTrainingButton
+                                        onClick={() => setShowBrandTraining(true)}
+                                        label="Input Guide"
+                                    />
+                                </div>
                                 <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
                             </div>
                             <form onSubmit={handleSubmit}>
@@ -231,6 +245,13 @@ export default function BrandsIndex({ brands = { data: [] }, subCategories = [] 
                     </div>
                 </div>
             )}
+
+            {/* Brand Training Guide Modal */}
+            <FormTrainingModal
+                isOpen={showBrandTraining}
+                onClose={() => setShowBrandTraining(false)}
+                formKey="brand"
+            />
         </AdminLayout>
     );
 }

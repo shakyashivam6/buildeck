@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 export default function SearchableSelect({
     options = [],
@@ -15,7 +16,9 @@ export default function SearchableSelect({
 }) {
     const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState('');
+    const [coords, setCoords] = useState({ top: 0, left: 0, minWidth: 0, maxWidth: 360, placement: 'bottom' });
     const dropdownRef = useRef(null);
+    const menuRef = useRef(null);
     const searchInputRef = useRef(null);
 
     // Selected item find karein
@@ -29,10 +32,55 @@ export default function SearchableSelect({
         return label.toLowerCase().includes(search.toLowerCase());
     });
 
+    const updateCoords = useCallback(() => {
+        if (!dropdownRef.current) return;
+        const rect = dropdownRef.current.getBoundingClientRect();
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const spaceAbove = rect.top;
+        const estimatedMenuHeight = 260;
+
+        let placement = 'bottom';
+        let top = rect.bottom + 2;
+
+        if (spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow) {
+            placement = 'top';
+            top = Math.max(10, rect.top - 2);
+        }
+
+        const minWidth = Math.max(rect.width, 240);
+        const maxWidth = Math.min(450, window.innerWidth - 20);
+        let left = rect.left;
+
+        if (left + minWidth > window.innerWidth - 10) {
+            left = Math.max(10, window.innerWidth - minWidth - 10);
+        }
+        if (left < 10) left = 10;
+
+        setCoords({
+            top,
+            left,
+            minWidth,
+            maxWidth,
+            placement,
+        });
+    }, []);
+
+    // Toggle menu
+    const handleToggle = () => {
+        if (disabled) return;
+        if (!isOpen) {
+            updateCoords();
+        }
+        setIsOpen(!isOpen);
+    };
+
     // Close on outside click
     useEffect(() => {
         function handleClickOutside(event) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+            const isClickInsideTrigger = dropdownRef.current && dropdownRef.current.contains(event.target);
+            const isClickInsideMenu = menuRef.current && menuRef.current.contains(event.target);
+
+            if (!isClickInsideTrigger && !isClickInsideMenu) {
                 setIsOpen(false);
             }
         }
@@ -42,10 +90,31 @@ export default function SearchableSelect({
         };
     }, []);
 
+    // Reposition on scroll (captured inside modals/tables) and window resize
+    useEffect(() => {
+        if (!isOpen) return;
+
+        updateCoords();
+
+        const handleScrollOrResize = () => {
+            updateCoords();
+        };
+
+        window.addEventListener('scroll', handleScrollOrResize, true);
+        window.addEventListener('resize', handleScrollOrResize);
+
+        return () => {
+            window.removeEventListener('scroll', handleScrollOrResize, true);
+            window.removeEventListener('resize', handleScrollOrResize);
+        };
+    }, [isOpen, updateCoords]);
+
     // Focus input when opened
     useEffect(() => {
         if (isOpen && searchInputRef.current) {
-            searchInputRef.current.focus();
+            setTimeout(() => {
+                searchInputRef.current?.focus();
+            }, 50);
         } else {
             setSearch('');
         }
@@ -68,19 +137,21 @@ export default function SearchableSelect({
                 id={id}
                 role="button"
                 tabIndex={disabled ? -1 : 0}
-                onClick={() => {
-                    if (!disabled) setIsOpen(!isOpen);
-                }}
+                onClick={handleToggle}
                 className={`form-control ${size === 'sm' ? 'form-control-sm' : ''} d-flex justify-content-between align-items-center ${
                     error ? 'is-invalid border-danger' : ''
                 } ${isOpen ? 'border-primary' : ''}`}
+                title={selectedItem ? selectedItem[nameKey] : ''}
                 style={{
                     cursor: disabled ? 'not-allowed' : 'pointer',
                     userSelect: 'none',
                     minHeight: size === 'sm' ? '31px' : '38px',
                 }}
             >
-                <span className={`text-truncate ${selectedItem ? 'text-body' : 'text-muted'}`}>
+                <span
+                    className={`text-truncate ${selectedItem ? 'text-body' : 'text-muted'}`}
+                    title={selectedItem ? selectedItem[nameKey] : ''}
+                >
                     {selectedItem ? selectedItem[nameKey] : placeholder}
                 </span>
                 <i
@@ -88,16 +159,24 @@ export default function SearchableSelect({
                 ></i>
             </div>
 
-            {/* Dropdown Menu (Bootstrap .dropdown-menu automatically supports Light & Dark themes) */}
-            {isOpen && (
+            {/* Dropdown Menu via Portal: Escapes all table-responsive and card boundaries */}
+            {isOpen && typeof document !== 'undefined' && createPortal(
                 <div
-                    className="dropdown-menu show w-100 p-0 shadow-lg border"
+                    ref={menuRef}
+                    className="dropdown-menu show p-0 shadow-lg border bg-body text-body"
                     style={{
-                        zIndex: 1060,
-                        position: 'absolute',
-                        top: '100%',
-                        left: 0,
-                        marginTop: '2px',
+                        zIndex: 99999,
+                        position: 'fixed',
+                        top: `${coords.top}px`,
+                        left: `${coords.left}px`,
+                        minWidth: `${coords.minWidth}px`,
+                        maxWidth: `${coords.maxWidth}px`,
+                        width: 'max-content',
+                        transform: coords.placement === 'top' ? 'translateY(-100%)' : 'none',
+                        backgroundColor: 'var(--bs-body-bg, #ffffff)',
+                        color: 'var(--bs-body-color, #212529)',
+                        borderColor: 'var(--bs-border-color, #dee2e6)',
+                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3)',
                     }}
                 >
                     {/* Search Input Box */}
@@ -122,7 +201,7 @@ export default function SearchableSelect({
                     <div
                         className="py-1"
                         style={{
-                            maxHeight: '220px',
+                            maxHeight: '240px',
                             overflowY: 'auto',
                         }}
                     >
@@ -139,8 +218,11 @@ export default function SearchableSelect({
                                             isSelected ? 'active' : ''
                                         }`}
                                         style={{ fontSize: '13.5px' }}
+                                        title={opt[nameKey]}
                                     >
-                                        <span className="text-truncate">{opt[nameKey]}</span>
+                                        <span className="text-truncate me-2" title={opt[nameKey]}>
+                                            {opt[nameKey]}
+                                        </span>
                                         {isSelected && (
                                             <i className="ri-check-line ms-2 flex-shrink-0"></i>
                                         )}
@@ -154,7 +236,8 @@ export default function SearchableSelect({
                             </div>
                         )}
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );
