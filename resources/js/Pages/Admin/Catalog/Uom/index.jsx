@@ -135,7 +135,7 @@ export default function UomIndex({ uoms = { data: [] } }) {
                                                 </span>
                                             </td>
                                             <td>
-                                                <span className={`badge ${uom.is_discrete ? 'bg-dark text-white' : 'bg-body-secondary text-body border'}`}>
+                                                <span className={`badge ${uom.is_discrete ? 'bg-dark text-white border border-dark' : 'bg-body-secondary text-body border'}`}>
                                                     {uom.is_discrete ? 'Packaged / Discrete' : 'Continuous / Bulk'}
                                                 </span>
                                             </td>

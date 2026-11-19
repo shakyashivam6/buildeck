@@ -8,3 +8,162 @@
     visibility: visible !important;
     opacity: 1 !important;
 }
+
+/* ==========================================================================
+   BuilDeck Application Badge & Color System Fixes
+   ========================================================================== */
+
+/* 1. Purple Palette Utilities (Light & Dark theme) */
+:root {
+    --highdmin-purple: #7042c1;
+    --highdmin-purple-rgb: 112, 66, 193;
+    --highdmin-purple-bg-subtle: #f1ebfc;
+    --highdmin-purple-border-subtle: #d8c6f7;
+    --highdmin-purple-text-emphasis: #5824a7;
+}
+
+[data-bs-theme="dark"] {
+    --highdmin-purple: #9d7fe3;
+    --highdmin-purple-rgb: 157, 127, 227;
+    --highdmin-purple-bg-subtle: #291e3e;
+    --highdmin-purple-border-subtle: #4e3877;
+    --highdmin-purple-text-emphasis: #c3aff5;
+}
+
+.text-purple {
+    color: var(--highdmin-purple-text-emphasis) !important;
+}
+
+.bg-purple {
+    background-color: var(--highdmin-purple) !important;
+    color: #ffffff !important;
+}
+
+.bg-purple-subtle {
+    background-color: var(--highdmin-purple-bg-subtle) !important;
+}
+
+.border-purple-subtle {
+    border-color: var(--highdmin-purple-border-subtle) !important;
+}
+
+.badge-purple {
+    color: #ffffff !important;
+    background-color: var(--highdmin-purple) !important;
+}
+
+.badge-soft-purple {
+    color: var(--highdmin-purple-text-emphasis) !important;
+    background-color: var(--highdmin-purple-bg-subtle) !important;
+}
+
+.badge-outline-purple {
+    color: var(--highdmin-purple) !important;
+    border: 1px solid var(--highdmin-purple) !important;
+    background-color: transparent !important;
+}
+
+/* 2. Fix Highdmin Dark Mode Inversion for Badges using .bg-dark */
+[data-bs-theme="dark"] .badge.bg-dark,
+[data-bs-theme="dark"] .bg-dark.badge {
+    background-color: #2b2e38 !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-dark.text-white,
+[data-bs-theme="dark"] .badge.bg-dark .text-white {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-dark.text-warning,
+[data-bs-theme="dark"] .badge.bg-dark .text-warning {
+    color: #f9bc0b !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-dark.text-info,
+[data-bs-theme="dark"] .badge.bg-dark .text-info {
+    color: #45bbe0 !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-dark.text-success,
+[data-bs-theme="dark"] .badge.bg-dark .text-success {
+    color: #0acf97 !important;
+}
+
+/* 3. Improve Light Mode Contrast for Warning Subtle Badges */
+.bg-warning-subtle.text-warning,
+.badge.bg-warning-subtle.text-warning {
+    color: #b78103 !important;
+}
+
+[data-bs-theme="dark"] .bg-warning-subtle.text-warning,
+[data-bs-theme="dark"] .badge.bg-warning-subtle.text-warning {
+    color: #f9bc0b !important;
+}
+
+/* 4. Defensive text colors for subtle badges (prevent default white text in badges) */
+.badge.bg-primary-subtle:not([class*="text-"]) { color: var(--highdmin-primary-text-emphasis, #02a3af) !important; }
+.badge.bg-secondary-subtle:not([class*="text-"]) { color: var(--highdmin-secondary-text-emphasis, #656bbc) !important; }
+.badge.bg-success-subtle:not([class*="text-"]) { color: var(--highdmin-success-text-emphasis, #09b080) !important; }
+.badge.bg-info-subtle:not([class*="text-"]) { color: var(--highdmin-info-text-emphasis, #3b9fbe) !important; }
+.badge.bg-warning-subtle:not([class*="text-"]) { color: var(--highdmin-warning-text-emphasis, #b78103) !important; }
+.badge.bg-danger-subtle:not([class*="text-"]) { color: var(--highdmin-danger-text-emphasis, #cd485c) !important; }
+.badge.bg-purple-subtle:not([class*="text-"]) { color: var(--highdmin-purple-text-emphasis, #5824a7) !important; }
+.badge.bg-body-secondary:not([class*="text-"]) { color: var(--highdmin-body-color, #495057) !important; }
+
+[data-bs-theme="dark"] .badge.bg-primary-subtle:not([class*="text-"]) { color: #50d2dc !important; }
+[data-bs-theme="dark"] .badge.bg-secondary-subtle:not([class*="text-"]) { color: #a4a9ea !important; }
+[data-bs-theme="dark"] .badge.bg-success-subtle:not([class*="text-"]) { color: #56ddb6 !important; }
+[data-bs-theme="dark"] .badge.bg-info-subtle:not([class*="text-"]) { color: #7ad1eb !important; }
+[data-bs-theme="dark"] .badge.bg-warning-subtle:not([class*="text-"]) { color: #fbe085 !important; }
+[data-bs-theme="dark"] .badge.bg-danger-subtle:not([class*="text-"]) { color: #f58898 !important; }
+[data-bs-theme="dark"] .badge.bg-purple-subtle:not([class*="text-"]) { color: #c3aff5 !important; }
+[data-bs-theme="dark"] .badge.bg-body-secondary:not([class*="text-"]) { color: #e2eeff !important; }
+
+/* 5. Muted and Light badge text contrast fixes */
+.badge.bg-light.text-muted,
+.badge.text-muted {
+    color: #5a6268 !important;
+}
+
+[data-bs-theme="dark"] .badge.bg-light.text-muted,
+[data-bs-theme="dark"] .badge.text-muted {
+    color: #aab8c5 !important;
+}
+
+/* 6. Additional Color Utilities (Teal, Orange) */
+:root {
+    --highdmin-orange: #fd7e14;
+    --highdmin-orange-bg-subtle: #fff1e5;
+    --highdmin-orange-border-subtle: #ffd6b3;
+    --highdmin-orange-text-emphasis: #b24d00;
+
+    --highdmin-teal: #20c997;
+    --highdmin-teal-bg-subtle: #e6faf4;
+    --highdmin-teal-border-subtle: #b1f0dc;
+    --highdmin-teal-text-emphasis: #0f7a5b;
+}
+
+[data-bs-theme="dark"] {
+    --highdmin-orange: #ff983d;
+    --highdmin-orange-bg-subtle: #332014;
+    --highdmin-orange-border-subtle: #66391a;
+    --highdmin-orange-text-emphasis: #ffb066;
+
+    --highdmin-teal: #3dd5a7;
+    --highdmin-teal-bg-subtle: #162f27;
+    --highdmin-teal-border-subtle: #1f5644;
+    --highdmin-teal-text-emphasis: #78e8c5;
+}
+
+.text-orange { color: var(--highdmin-orange-text-emphasis) !important; }
+.bg-orange { background-color: var(--highdmin-orange) !important; color: #ffffff !important; }
+.bg-orange-subtle { background-color: var(--highdmin-orange-bg-subtle) !important; }
+.border-orange-subtle { border-color: var(--highdmin-orange-border-subtle) !important; }
+
+.text-teal { color: var(--highdmin-teal-text-emphasis) !important; }
+.bg-teal { background-color: var(--highdmin-teal) !important; color: #ffffff !important; }
+.bg-teal-subtle { background-color: var(--highdmin-teal-bg-subtle) !important; }
+.border-teal-subtle { border-color: var(--highdmin-teal-border-subtle) !important; }
+
