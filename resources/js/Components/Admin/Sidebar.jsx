@@ -1,8 +1,10 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 
 export default function Sidebar() {
     const { auth } = usePage().props;
     const authUser = auth.user;
+    const [loadingRoute, setLoadingRoute] = useState(null);
 
     const navItems = [
         {
@@ -56,6 +58,62 @@ export default function Sidebar() {
         },
     ];
 
+    useEffect(() => {
+        const unregisterStart = router.on('start', (event) => {
+            try {
+                const visitUrl = event?.detail?.visit?.url;
+                if (!visitUrl) return;
+
+                const urlStr = typeof visitUrl === 'string' ? visitUrl : (visitUrl.pathname || visitUrl.href || '');
+                const targetPath = new URL(urlStr, window.location.origin).pathname;
+
+                for (const item of navItems) {
+                    if (item.route) {
+                        try {
+                            const itemPath = new URL(route(item.route), window.location.origin).pathname;
+                            if (itemPath === targetPath) {
+                                setLoadingRoute(item.route);
+                                return;
+                            }
+                        } catch {}
+                    }
+                    if (item.children) {
+                        for (const child of item.children) {
+                            try {
+                                const childPath = new URL(route(child.route), window.location.origin).pathname;
+                                if (childPath === targetPath) {
+                                    setLoadingRoute(child.route);
+                                    return;
+                                }
+                            } catch {}
+                        }
+                    }
+                }
+            } catch {
+                // Ignore url parse errors
+            }
+        });
+
+        const unregisterFinish = router.on('finish', () => {
+            setLoadingRoute(null);
+        });
+
+        const unregisterCancel = router.on('cancel', () => {
+            setLoadingRoute(null);
+        });
+
+        const unregisterError = router.on('error', () => {
+            setLoadingRoute(null);
+        });
+
+        return () => {
+            unregisterStart();
+            unregisterFinish();
+            unregisterCancel();
+            unregisterError();
+        };
+    }, []);
+
     const isRouteActive = (routeName) => {
         try {
             return route().current(routeName);
@@ -64,7 +122,15 @@ export default function Sidebar() {
         }
     };
 
+    const hasChildLoading = (item) => {
+        if (!item.children) return false;
+        return item.children.some((child) => child.route === loadingRoute);
+    };
+
     const isItemActive = (item) => {
+        if (loadingRoute === item.route) {
+            return true;
+        }
         if (item.activePattern && isRouteActive(item.activePattern)) {
             return true;
         }
@@ -74,6 +140,7 @@ export default function Sidebar() {
         if (item.children) {
             return item.children.some(
                 (child) =>
+                    loadingRoute === child.route ||
                     isRouteActive(child.route) ||
                     (child.activePattern && isRouteActive(child.activePattern))
             );
@@ -88,7 +155,11 @@ export default function Sidebar() {
             <div className="sidenav-menu">
 
                 {/* Brand Logo */}
-                <Link href={route('dashboard')} className="logo">
+                <Link
+                    href={route('dashboard')}
+                    onClick={() => setLoadingRoute('dashboard')}
+                    className="logo position-relative"
+                >
                     <span className="logo-light">
                         <span className="logo-lg"><img src="/assets/images/light-logo.png" alt="logo" /></span>
                         <span className="logo-sm"><img src="/assets/images/light-logo.png" alt="small logo" /></span>
@@ -98,6 +169,14 @@ export default function Sidebar() {
                         <span className="logo-lg"><img src="/assets/images/dark-logo.png" style={{ height: '3rem' }} alt="dark logo" /></span>
                         <span className="logo-sm"><img src="/assets/images/dark-logo.png" alt="small logo" /></span>
                     </span>
+
+                    {loadingRoute === 'dashboard' && (
+                        <span
+                            className="position-absolute end-0 top-50 translate-middle-y me-3 spinner-border spinner-border-sm text-info"
+                            role="status"
+                            style={{ width: '0.85rem', height: '0.85rem', borderWidth: '1.5px' }}
+                        ></span>
+                    )}
                 </Link>
 
                 {/* Sidebar Hover Menu Toggle Button */}
@@ -166,10 +245,20 @@ export default function Sidebar() {
                                     href={route('logout')}
                                     method='post'
                                     as="button"
-                                    className="dropdown-item active fw-semibold text-danger w-100 text-start"
+                                    onClick={() => setLoadingRoute('logout')}
+                                    className="dropdown-item active fw-semibold text-danger w-100 text-start d-flex align-items-center justify-content-between"
                                 >
-                                    <i className="ri-logout-box-line me-1 fs-16 align-middle"></i>
-                                    <span className="align-middle">Sign Out</span>
+                                    <span>
+                                        <i className="ri-logout-box-line me-1 fs-16 align-middle"></i>
+                                        <span className="align-middle">Sign Out</span>
+                                    </span>
+                                    {loadingRoute === 'logout' && (
+                                        <span
+                                            className="spinner-border spinner-border-sm text-danger ms-2"
+                                            role="status"
+                                            style={{ width: '0.85rem', height: '0.85rem', borderWidth: '1.5px' }}
+                                        ></span>
+                                    )}
                                 </Link>
                             </div>
                         </div>
@@ -181,6 +270,7 @@ export default function Sidebar() {
 
                         {navItems.map((item, index) => {
                             const active = isItemActive(item);
+                            const childLoading = hasChildLoading(item);
 
                             if (item.children && item.children.length > 0) {
                                 return (
@@ -192,33 +282,68 @@ export default function Sidebar() {
                                             aria-controls={item.id}
                                             className={`side-nav-link ${active ? 'active' : ''}`}
                                         >
-                                            <span className="menu-icon"><i className={item.icon}></i></span>
+                                            <span className="menu-icon">
+                                                {childLoading ? (
+                                                    <span
+                                                        className="spinner-border spinner-border-sm text-info align-middle"
+                                                        role="status"
+                                                        style={{ width: '0.95rem', height: '0.95rem', borderWidth: '2px' }}
+                                                    ></span>
+                                                ) : (
+                                                    <i className={item.icon}></i>
+                                                )}
+                                            </span>
                                             <span className="menu-text"> {item.title}</span>
+                                            {childLoading ? (
+                                                <span className="badge bg-info-subtle text-info fs-10 px-1 py-0 rounded ms-auto me-2">
+                                                    Loading...
+                                                </span>
+                                            ) : null}
                                             <span className="menu-arrow"></span>
                                         </a>
                                         <div className={`collapse ${active ? 'show' : ''}`} id={item.id}>
                                             <ul className="sub-menu">
                                                 {item.children.map((child, cIndex) => {
+                                                    const isChildLoading = loadingRoute === child.route;
                                                     const childActive =
                                                         isRouteActive(child.route) ||
                                                         (child.activePattern && isRouteActive(child.activePattern));
                                                     return (
                                                         <li
                                                             key={child.route || cIndex}
-                                                            className={`side-nav-item ${childActive ? 'active' : ''}`}
+                                                            className={`side-nav-item ${childActive || isChildLoading ? 'active' : ''}`}
                                                         >
                                                             <Link
                                                                 href={route(child.route)}
-                                                                className={`side-nav-link ${childActive ? 'active text-info fw-semibold' : ''}`}
+                                                                onClick={() => setLoadingRoute(child.route)}
+                                                                className={`side-nav-link ${childActive || isChildLoading ? 'active text-info fw-semibold' : ''}`}
                                                             >
-                                                                <span className="menu-text d-flex align-items-center gap-2">
-                                                                    {childActive && (
-                                                                        <span
-                                                                            className="badge rounded-pill bg-info p-1"
-                                                                            style={{ width: 6, height: 6 }}
-                                                                        ></span>
+                                                                <span className="menu-text d-flex align-items-center justify-content-between w-100">
+                                                                    <span className="d-flex align-items-center gap-2">
+                                                                        {isChildLoading ? (
+                                                                            <span
+                                                                                className="spinner-border spinner-border-sm text-info flex-shrink-0"
+                                                                                role="status"
+                                                                                style={{ width: '0.75rem', height: '0.75rem', borderWidth: '1.5px' }}
+                                                                            ></span>
+                                                                        ) : childActive ? (
+                                                                            <span
+                                                                                className="badge rounded-pill bg-info p-1 flex-shrink-0"
+                                                                                style={{ width: 6, height: 6 }}
+                                                                            ></span>
+                                                                        ) : (
+                                                                            <span
+                                                                                className="badge rounded-pill bg-transparent p-1 flex-shrink-0"
+                                                                                style={{ width: 6, height: 6 }}
+                                                                            ></span>
+                                                                        )}
+                                                                        <span>{child.title}</span>
+                                                                    </span>
+                                                                    {isChildLoading && (
+                                                                        <span className="badge bg-info-subtle text-info fs-10 px-1.5 py-0.5 rounded">
+                                                                            Loading...
+                                                                        </span>
                                                                     )}
-                                                                    {child.title}
                                                                 </span>
                                                             </Link>
                                                         </li>
@@ -230,13 +355,35 @@ export default function Sidebar() {
                                 );
                             }
 
+                            const isItemLoading = loadingRoute === item.route;
+
                             return (
-                                <li key={item.route || index} className={`side-nav-item ${active ? 'active' : ''}`}>
-                                    <Link href={route(item.route)} className={`side-nav-link ${active ? 'active' : ''}`}>
-                                        <span className="menu-icon"><i className={item.icon}></i></span>
+                                <li key={item.route || index} className={`side-nav-item ${active || isItemLoading ? 'active' : ''}`}>
+                                    <Link
+                                        href={route(item.route)}
+                                        onClick={() => setLoadingRoute(item.route)}
+                                        className={`side-nav-link ${active || isItemLoading ? 'active' : ''}`}
+                                    >
+                                        <span className="menu-icon">
+                                            {isItemLoading ? (
+                                                <span
+                                                    className="spinner-border spinner-border-sm text-info align-middle"
+                                                    role="status"
+                                                    style={{ width: '0.95rem', height: '0.95rem', borderWidth: '2px' }}
+                                                ></span>
+                                            ) : (
+                                                <i className={item.icon}></i>
+                                            )}
+                                        </span>
                                         <span className="menu-text"> {item.title} </span>
-                                        {item.badge && (
-                                            <span className={item.badge.className}>{item.badge.text}</span>
+                                        {isItemLoading ? (
+                                            <span className="badge bg-info-subtle text-info fs-10 ms-auto">
+                                                Loading...
+                                            </span>
+                                        ) : (
+                                            item.badge && (
+                                                <span className={item.badge.className}>{item.badge.text}</span>
+                                            )
                                         )}
                                     </Link>
                                 </li>
