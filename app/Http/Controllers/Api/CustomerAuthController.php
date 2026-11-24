@@ -273,10 +273,6 @@ class CustomerAuthController extends Controller
             ];
         }
 
-        // Fetch nearby products available in customer's area
-        $catalogService = app(CustomerCatalogService::class);
-        $items = $catalogService->getNearbyItems($coords['lat'] ?? null, $coords['long'] ?? null);
-
         $token = $user->createToken('customer-mobile-token')->plainTextToken;
 
         return response()->json([
@@ -302,7 +298,6 @@ class CustomerAuthController extends Controller
                     'profile_pic' => $user->profile_pic ? asset('storage/' . $user->profile_pic) : null,
                 ],
                 'customer_location' => $coords,
-                'items' => $items,
             ],
         ], 200);
     }

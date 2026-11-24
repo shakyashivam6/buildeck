@@ -132,7 +132,7 @@ class CustomerGeoDiscoveryAndLoginTest extends TestCase
         }
     }
 
-    public function test_customer_can_login_with_lat_long_and_receives_nearby_items(): void
+    public function test_customer_can_login_with_lat_long_and_updates_location(): void
     {
         $response = $this->postJson('/api/customer/login', [
             'login' => '9876543210',
@@ -149,7 +149,6 @@ class CustomerGeoDiscoveryAndLoginTest extends TestCase
                     'token',
                     'user' => ['id', 'name', 'mobile', 'lat', 'long'],
                     'customer_location' => ['lat', 'long'],
-                    'items',
                 ],
             ]);
 
@@ -158,8 +157,11 @@ class CustomerGeoDiscoveryAndLoginTest extends TestCase
         $this->assertEquals(26.8467, (float) $this->customerUser->lat);
         $this->assertEquals(80.9462, (float) $this->customerUser->long);
 
-        // Nearby vendor's product (Cement) should be in items list
-        $items = $response->json('data.items');
+        // Flutter dev manages items via dedicated catalog API call
+        $catalogResponse = $this->getJson('/api/customer/catalog?lat=26.8467&long=80.9462');
+        $catalogResponse->assertStatus(200);
+
+        $items = $catalogResponse->json('data.items');
         $this->assertNotEmpty($items);
         $this->assertEquals($this->cementProduct->id, $items[0]['id']);
         $this->assertArrayHasKey('brand_name', $items[0]);
@@ -187,9 +189,6 @@ class CustomerGeoDiscoveryAndLoginTest extends TestCase
             ->assertJsonPath('res', 'success')
             ->assertJsonPath('data.customer_location.lat', 26.8467)
             ->assertJsonPath('data.customer_location.long', 80.9462);
-
-        $items = $response->json('data.items');
-        $this->assertNotEmpty($items);
     }
 
     public function test_customer_can_login_without_lat_long_keeping_keys_optional(): void
