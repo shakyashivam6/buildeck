@@ -1,11 +1,13 @@
 import AdminLayout from "@/Layouts/AdminLayout";
 import SearchableSelect from "@/Components/SearchableSelect";
+import GoogleMapPicker from "@/Components/GoogleMapPicker";
 import { Head, useForm, usePage, router } from "@inertiajs/react";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-export default function Index({ states = [], vendors = { data: [] } }) {
+export default function Index({ states = [], vendors = { data: [] }, googleMapsApiKey = '' }) {
     const { flash } = usePage().props;
+    const resolvedGoogleMapsApiKey = googleMapsApiKey || usePage().props.googleMapsApiKey || '';
 
     const [activeTab, setActiveTab] = useState('list'); // 'list' | 'form'
     const [editingVendor, setEditingVendor] = useState(null);
@@ -610,8 +612,42 @@ export default function Index({ states = [], vendors = { data: [] } }) {
                                             {errors.pincode && <div className="invalid-feedback">{errors.pincode}</div>}
                                         </div>
 
+                                        <div className="col-12 mt-3">
+                                            <div className="d-flex justify-content-between align-items-center mb-1">
+                                                <label className="form-label mb-0 fw-semibold">
+                                                    <i className="ri-map-pin-range-line me-1 text-primary"></i>
+                                                    Select Location on Google Map
+                                                </label>
+                                                <span className="text-muted fs-12">Search location, fetch current GPS, or click/drag marker</span>
+                                            </div>
+                                            <GoogleMapPicker
+                                                apiKey={resolvedGoogleMapsApiKey}
+                                                lat={data.lat}
+                                                lng={data.long}
+                                                radius={data.supply_radius}
+                                                onLocationSelect={(selectedLat, selectedLng) => {
+                                                    setData((prev) => ({
+                                                        ...prev,
+                                                        lat: selectedLat,
+                                                        long: selectedLng,
+                                                    }));
+                                                }}
+                                                onAddressSelect={(addressInfo) => {
+                                                    if (!data.address && addressInfo.formattedAddress) {
+                                                        setData((prev) => ({
+                                                            ...prev,
+                                                            address: addressInfo.formattedAddress,
+                                                            pincode: prev.pincode || addressInfo.pincode || '',
+                                                        }));
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+
                                         <div className="col-md-6">
-                                            <label htmlFor="lat" className="form-label">Latitude</label>
+                                            <label htmlFor="lat" className="form-label">
+                                                Latitude <span className="text-muted fw-normal fs-12">(Auto-filled from map)</span>
+                                            </label>
                                             <input
                                                 type="text"
                                                 id="lat"
@@ -624,7 +660,9 @@ export default function Index({ states = [], vendors = { data: [] } }) {
                                         </div>
 
                                         <div className="col-md-6">
-                                            <label htmlFor="long" className="form-label">Longitude</label>
+                                            <label htmlFor="long" className="form-label">
+                                                Longitude <span className="text-muted fw-normal fs-12">(Auto-filled from map)</span>
+                                            </label>
                                             <input
                                                 type="text"
                                                 id="long"

@@ -7,6 +7,7 @@ use App\Http\Controllers\Support\SupportController;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\VendorProfile;
+use App\Services\GoogleMapsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,13 @@ use Inertia\Response;
 
 class VendorController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct(
+        protected GoogleMapsService $googleMapsService
+    ) {}
+
     public function index(): Response
     {
         $states = SupportController::getStatesList();
@@ -29,6 +37,7 @@ class VendorController extends Controller
         return Inertia::render('Admin/Onboard/Vendor/index', [
             'states' => $states,
             'vendors' => $vendors,
+            'googleMapsApiKey' => $this->googleMapsService->getApiKey(),
         ]);
     }
 
