@@ -192,12 +192,18 @@ Login using Mobile Number (or Email) and Password.
 - **Auth:** Not required
 
 #### 📥 Request Body
+Supports optional `lat`, `long`, or `latlong` string format. If provided, the login response directly reverts the nearby available products (`items`) matching the customer's area!
+
 ```json
 {
   "login": "9876543210",
-  "password": "yourPassword123"
+  "password": "yourPassword123",
+  "lat": 26.38967,
+  "long": 80.48587346,
+  "latlong": "(26.38967,80.48587346)"
 }
 ```
+*(Note: `lat`, `long`, and `latlong` are completely **optional**)*
 
 #### ✅ Success Response (200 OK)
 ```json
@@ -219,8 +225,26 @@ Login using Mobile Number (or Email) and Password.
       "city": "Noida",
       "state": "Uttar Pradesh",
       "zip": "201301",
+      "lat": 26.38967,
+      "long": 80.48587346,
       "profile_pic": "https://your-domain.com/storage/customer_documents/photo123.jpg"
-    }
+    },
+    "customer_location": {
+      "lat": 26.38967,
+      "long": 80.48587346
+    },
+    "items": [
+      {
+        "id": 10,
+        "name": "UltraTech Super Cement",
+        "brand_name": "UltraTech",
+        "cover_image_url": "https://your-domain.com/storage/products/cement.jpg",
+        "base_uom": "Kilogram",
+        "base_uom_symbol": "kg",
+        "available_vendors_count": 3,
+        "starting_price": 380.00
+      }
+    ]
   }
 }
 ```
@@ -401,12 +425,15 @@ Future<void> registerCustomer({
 
 ---
 
-### 4.2 Customer Login Example
+### 4.2 Customer Login Example (With Coordinates Support)
 
 ```dart
-Future<String?> loginCustomer({
+Future<Map<String, dynamic>?> loginCustomer({
   required String login, // Mobile or Email
   required String password,
+  double? lat,
+  double? long,
+  String? latlong, // e.g. "(26.38967,80.48587346)"
 }) async {
   final dio = Dio(BaseOptions(
     baseUrl: 'https://your-domain.com/api',
@@ -417,13 +444,124 @@ Future<String?> loginCustomer({
     final response = await dio.post('/customer/login', data: {
       'login': login,
       'password': password,
+      if (lat != null) 'lat': lat,
+      if (long != null) 'long': long,
+      if (latlong != null) 'latlong': latlong,
     });
 
     final String token = response.data['data']['token'];
-    // Save token to flutter_secure_storage or SharedPreferences
-    return token;
+    final List<dynamic> nearbyItems = response.data['data']['items'] ?? [];
+    // Save token to flutter_secure_storage
+    // Display nearby items immediately on home catalog!
+    return response.data['data'];
   } on DioException catch (e) {
     print('Login Failed: ${e.response?.data['msg']}');
+    return null;
+  }
+}
+```
+
+---
+
+## 🛍️ 5. Customer Geo-Catalog & Product Discovery APIs
+
+### 5.1 Get Geo-Located Items Catalog
+Customer ke location ke according nearby vendors ke master items flash karta hai.
+
+- **Method:** `GET`
+- **URL:** `/customer/catalog`
+- **Query Parameters:** `lat`, `long`, `latlong` (all optional, falls back to saved user coords if authenticated), `search`, `category_id`
+- **Auth:** Optional
+
+#### Response (200 OK)
+```json
+{
+  "auth_status": true,
+  "res": "success",
+  "msg": "Nearby items fetched successfully.",
+  "data": {
+    "customer_location": { "lat": 26.38967, "long": 80.48587346 },
+    "total_items": 12,
+    "items": [
+      {
+        "id": 10,
+        "name": "UltraTech Super Cement",
+        "brand_name": "UltraTech",
+        "cover_image_url": "https://domain.com/storage/products/cement.jpg",
+        "base_uom": "Kilogram",
+        "base_uom_symbol": "kg",
+        "available_vendors_count": 3,
+        "starting_price": 380.00
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 5.2 Get Product Details & Available Vendors in Area
+Item click par detailed page open hota hai jisme product specifications aur user ke area me provide karne wale vendors ki live list milti hai.
+
+- **Method:** `GET`
+- **URL:** `/customer/products/{productId}`
+- **Query Parameters:** `lat`, `long`, `latlong` (optional)
+- **Auth:** Optional
+
+#### Response (200 OK)
+```json
+{
+  "auth_status": true,
+  "res": "success",
+  "msg": "Product details and nearby vendors loaded.",
+  "data": {
+    "product": {
+      "id": 10,
+      "name": "UltraTech Super Cement",
+      "brand": { "id": 2, "name": "UltraTech", "logo_url": "..." },
+      "cover_image_url": "https://domain.com/storage/products/cement.jpg",
+      "description": "Premium quality cement...",
+      "specifications": { "grade": "PPC 53" }
+    },
+    "nearby_vendors": [
+      {
+        "vendor_id": 4,
+        "vendor_name": "Gupta Hardware & Sanitary",
+        "distance_km": 2.3,
+        "available_stock": 250.0,
+        "is_in_stock": true,
+        "starting_price": 380.00,
+        "allows_loose_sale": true
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 5.3 Vendor Pricing Drawer (BottomSheet)
+Vendor click par drawer flash karne ke liye packaging aur price options fetch karein:
+- **Method:** `GET`
+- **URL:** `/customer/products/{productId}/pricing-modal?vendor_id={vendorId}`
+
+### 5.4 Add to Cart
+Drawer me Complete Package ya Loose Sale input submit karne par cart me add karein:
+- **Method:** `POST`
+- **URL:** `/customer/cart/add`
+- **Auth:** Required (Bearer Token)
+- **Body:**
+```json
+{
+  "vendor_id": 4,
+  "product_id": 10,
+  "uom_id": 1,
+  "purchase_type": "loose",
+  "quantity": 15.5
+}
+```
+*(Ya Full Package: `"purchase_type": "package"`, `"quantity": 2`)*
+
     return null;
   }
 }

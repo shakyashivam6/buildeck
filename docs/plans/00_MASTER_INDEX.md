@@ -22,6 +22,7 @@ Is architecture ke 3 core modules hain:
 | **[Step 1: Vendor Products API Management](file:///e:/GIT/buildeck/docs/plans/01_STEP1_VENDOR_PRODUCTS_CONTROLLER_AND_API.md)** | `01_STEP1_VENDOR_PRODUCTS_CONTROLLER_AND_API.md` | `vendor_products` table, `VendorProductManagementController`, Master catalog listing, Adding products to vendor inventory, Stock & Price updates. |
 | **[Step 2: Vendor Stock Ledger System](file:///e:/GIT/buildeck/docs/plans/02_STEP2_VENDOR_STOCK_LEDGER_SYSTEM.md)** | `02_STEP2_VENDOR_STOCK_LEDGER_SYSTEM.md` | `vendor_stock_ledgers` table, Audit trail of every single stock movement, FIFO / Transaction locking (`lockForUpdate`), Stock history APIs. |
 | **[Step 3: Customer Cart & Dynamic UOM Modal](file:///e:/GIT/buildeck/docs/plans/03_STEP3_CUSTOMER_CART_UOM_MODAL.md)** | `03_STEP3_CUSTOMER_CART_UOM_MODAL.md` | Multi-UOM selection (Complete Package vs Loose sale), live vendor stock validation, cart data contract, and pricing engine. |
+| **[Step 4: Geo-Location Discovery & Vendor Pricing Drawer](file:///e:/GIT/buildeck/docs/plans/04_STEP4_GEO_ITEM_DISCOVERY_AND_VENDOR_DRAWER.md)** | `04_STEP4_GEO_ITEM_DISCOVERY_AND_VENDOR_DRAWER.md` | Customer Lat/Long intake, nearby vendor & catalog aggregation, Item Details with vendor list, and bottom pricing drawer (Package vs Loose input). |
 
 ---
 
@@ -76,3 +77,8 @@ Stores in: `products` & `product_uom_prices`
    - Create `cart_items` table with UOM and pricing type support.
    - Expose product pricing configuration API for modal (`GET /api/customer/products/{id}/pricing-modal`).
    - Implement stock-aware cart validations (`POST /api/customer/cart/add`).
+4. **Phase 4: Customer Geo-Discovery & Vendor Pricing Drawer (Step 4)**
+   - Implement customer GPS location (`lat`, `long`) filtering via Haversine distance formula against `vendor_profiles.supply_radius`.
+   - Build Catalog discovery API (`GET /api/customer/catalog?lat=...&long=...`) displaying Item Image, Name, and Brand Name in small text.
+   - Build Item Details API (`GET /api/customer/products/{id}?lat=...&long=...`) with list of active nearby vendors.
+   - Wire up Vendor Pricing Drawer (BottomSheet) allowing one-tap price checks for Complete Package vs Loose Sale (quantity input field) and instant Add-to-Cart.

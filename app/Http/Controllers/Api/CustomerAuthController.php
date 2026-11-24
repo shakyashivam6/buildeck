@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerProfile;
 use App\Models\User;
+use App\Services\CustomerCatalogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -198,12 +199,16 @@ class CustomerAuthController extends Controller
 
     /**
      * Customer login using mobile/email and password via Laravel Sanctum.
+     * Optionally accepts lat, long, or latlong to revert customer items list according to their location.
      */
     public function login(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'login' => ['required', 'string'],
             'password' => ['required', 'string'],
+            'lat' => ['nullable', 'numeric'],
+            'long' => ['nullable', 'numeric'],
+            'latlong' => ['nullable', 'string'],
         ]);
 
         if ($validator->fails()) {
@@ -247,6 +252,31 @@ class CustomerAuthController extends Controller
             ], 403);
         }
 
+        // Parse optional coordinates if passed in request
+        $coords = CustomerCatalogService::parseCoordinates(
+            $request->input('lat'),
+            $request->input('long'),
+            $request->input('latlong')
+        );
+
+        if ($coords) {
+            $user->update([
+                'lat' => $coords['lat'],
+                'long' => $coords['long'],
+            ]);
+            $user->lat = $coords['lat'];
+            $user->long = $coords['long'];
+        } elseif ($user->lat !== null && $user->long !== null) {
+            $coords = [
+                'lat' => (float) $user->lat,
+                'long' => (float) $user->long,
+            ];
+        }
+
+        // Fetch nearby products available in customer's area
+        $catalogService = app(CustomerCatalogService::class);
+        $items = $catalogService->getNearbyItems($coords['lat'] ?? null, $coords['long'] ?? null);
+
         $token = $user->createToken('customer-mobile-token')->plainTextToken;
 
         return response()->json([
@@ -267,8 +297,12 @@ class CustomerAuthController extends Controller
                     'city' => $user->city?->name,
                     'state' => $user->state?->name,
                     'zip' => $user->zip,
+                    'lat' => $user->lat ? (float) $user->lat : null,
+                    'long' => $user->long ? (float) $user->long : null,
                     'profile_pic' => $user->profile_pic ? asset('storage/' . $user->profile_pic) : null,
                 ],
+                'customer_location' => $coords,
+                'items' => $items,
             ],
         ], 200);
     }

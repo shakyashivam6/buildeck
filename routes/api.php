@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\ApiSupportController;
 use App\Http\Controllers\Api\CustomerAuthController;
 use App\Http\Controllers\Api\CustomerCartController;
+use App\Http\Controllers\Api\CustomerProductCatalogController;
 use App\Http\Controllers\Api\VendorAuthController;
 use App\Http\Controllers\Api\Vendor\VendorProductManagementController;
 use Illuminate\Http\Request;
@@ -37,6 +38,10 @@ Route::prefix('vendor')->group(function () {
 Route::prefix('customer')->group(function () {
     Route::post('register', [CustomerAuthController::class, 'register']);
     Route::post('login', [CustomerAuthController::class, 'login']);
+
+    // Geo-Location Catalog & Product Details with Nearby Vendors
+    Route::get('catalog', [CustomerProductCatalogController::class, 'catalog']);
+    Route::get('products/{productId}', [CustomerProductCatalogController::class, 'productDetails']);
 
     // Dynamic Multi-UOM Pricing Modal for Add-To-Cart
     Route::get('products/{productId}/pricing-modal', [CustomerCartController::class, 'pricingModal']);
